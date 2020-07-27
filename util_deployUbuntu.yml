@@ -1,6 +1,6 @@
 ---
 - hosts: localhost
-  name: util_depployUbuntu.yml
+  name: util_DeployUbuntu.yml
   gather_facts: false
   vars:
     LOCAL_TempDir: "/tmp"
