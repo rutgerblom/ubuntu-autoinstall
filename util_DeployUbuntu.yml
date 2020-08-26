@@ -14,7 +14,7 @@
     DataCenter: ha-datacenter
     vSphereCluster: ""
     VMFolder: ha-datacenter/vm
-    DataStore: VMs
+    DataStore: Local_VMs
     DataStoreDir: /SDDCLab-ISO-Folder
     UbuntuVMName: ubuntu-server
     UbuntuVMDiskSize: 50           # gigabytes
