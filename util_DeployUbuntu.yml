@@ -3,35 +3,35 @@
   name: util_DeployUbuntu.yml
   gather_facts: false
   vars:
-    TempDir: /tmp
-    WorkingDir: /tmp/ubuntu20
-    UbuntuISO: ubuntu-20.04.1-live-server-amd64.iso
-    UbuntuISO_URL: https://releases.ubuntu.com/20.04/ubuntu-20.04.1-live-server-amd64.iso
-    UbuntuNewISO: ubuntu2004.iso
-    ESXiHost: esxi03.demo.local
-    ESXiUser: root
-    ESXiPassword: VMware1!
-    DataCenter: ha-datacenter
-    vSphereCluster: ""
-    VMFolder: ha-datacenter/vm
-    DataStore: Local_VMs
-    DataStoreDir: /SDDCLab-ISO-Folder
-    UbuntuVMName: my-ubuntu-server
-    UbuntuVMDiskSize: 50           # gigabytes
-    UbuntuVMMemorySize: 2048       # megabytes
-    UbuntuVMCPUs: 1
-    UbuntuVMCPUCores: 1
-    UbuntuVMPortGroup: Lab-Routers
-    UbuntuOSLocale: en_US
-    UbuntuOSKeyboardLayout: en
-    UbuntuOSKeyboardVariant: us
-    UbuntuOSIPv4Address: 10.203.0.50/24
-    UbuntuOSIPv4Gateway: 10.203.0.1
-    UbuntuOSIPv4DNS: 10.203.0.5
-    UbuntuOSSearchDomain: sddc.lab
-    UbuntuOSHostname: my-ubuntu-server
-    UbuntuOSUser: ubuntu
-    UbuntuOSPassword: VMware1!
+    TempDir: /tmp                                      # Temp directory on the local machine
+    WorkingDir: /tmp/ubuntu20                          # Working directory on the local machine
+    UbuntuISO: ubuntu-20.04.1-live-server-amd64.iso    # Name of the Ubuntu Server ISO file 
+    UbuntuISO_URL: https://releases.ubuntu.com/20.04/  # URL to the Ubuntu Server ISO
+    UbuntuNewISO: ubuntu2004.iso                       # Name of the custom ISO that will be created
+    vCenterServer: vcenter.demo.local                  # vSphere vCenter FQDN
+    vCenterUser: administrator@vsphere.local           # vSphere vCenter username
+    vCenterPassword: VMware1!                          # vSphere vCenter password
+    DataCenter: Datacenter                             # vSphere vCenter datacenter
+    vSphereCluster: Demo                               # vSphere  vCenter cluster
+    VMFolder: Datacenter/vm/Demo                       # vSphere vCenter VM folder
+    Datastore: Demo                                    # vSphere datastore              
+    DatastoreDir: /Demo-ISO-Folder                     # vSphere datastore directory                            
+    UbuntuVMName: demo-server                          # Ubuntu VM name of the virtual machine          
+    UbuntuVMDiskSize: 50                               # Ubuntu VM disksize in gigabytes
+    UbuntuVMMemorySize: 2048                           # Ubuntu VM memory size in megabytes
+    UbuntuVMCPUs: 1                                    # Ubuntu VM number of CPUs 
+    UbuntuVMCPUCores: 1                                # Ubuntu VM number of cores
+    UbuntuVMPortGroup: Demo-VLAN                       # Ubuntu VM vSphere portgroup 
+    UbuntuOSLocale: en_US                              # Ubuntu OS locale
+    UbuntuOSKeyboardLayout: en                         # Ubuntu OS keyboard layout 
+    UbuntuOSKeyboardVariant: us                        # Ubuntu OS keyboard variant
+    UbuntuOSIPv4Address: 10.203.0.50/24                # Ubuntu OS IPv4 address
+    UbuntuOSIPv4Gateway: 10.203.0.1                    # Ubuntu OS IPv4 gateway
+    UbuntuOSIPv4DNS: 10.203.0.5                        # Ubuntu OS DNS server
+    UbuntuOSSearchDomain: sddc.lab                     # Ubuntu OS DNS search domain
+    UbuntuOSHostname: demo-server                      # Ubuntu OS hostname
+    UbuntuOSUser: ubuntu                               # Ubuntu OS username
+    UbuntuOSPassword: VMware1!                         # Ubuntu OS password
   tasks:
     - name: Create working directory on Ansible Controller
       file:
@@ -92,20 +92,20 @@
 
     - name: Upload the custom Ubuntu ISO to the vSphere datastore
       vsphere_copy: 
-        hostname: "{{ ESXiHost }}"
-        username: "{{ ESXiUser }}"
-        password: "{{ ESXiPassword }}"
+        hostname: "{{ vCenterServer }}"
+        username: "{{ vCenterUser }}"
+        password: "{{ vCenterPassword }}"
         validate_certs: no
         datacenter: "{{ DataCenter }}"
         src: "{{ TempDir }}/{{ UbuntuNewISO }}" 
-        datastore: "{{ DataStore }}"
-        path: "{{ DataStoreDir }}/{{ UbuntuNewISO }}"
+        datastore: "{{ Datastore }}"
+        path: "{{ DatastoreDir }}/{{ UbuntuNewISO }}"
 
     - name: Deploy Ubuntu VM
       vmware_guest:
-        hostname: "{{ ESXiHost }}"
-        username: "{{ ESXiUser }}"
-        password: "{{ ESXiPassword }}"
+        hostname: "{{ vCenterServer }}"
+        username: "{{ vCenterUser }}"
+        password: "{{ vCenterPassword }}"
         validate_certs: no
         name: "{{ UbuntuVMName }}"
         state: poweredon
@@ -116,7 +116,7 @@
         disk:
         - size_gb: "{{ UbuntuVMDiskSize }}"
           type: thin
-          datastore: "{{ DataStore }}"
+          datastore: "{{ Datastore }}"
         hardware:
           memory_mb: "{{ UbuntuVMMemorySize }}"
           num_cpus: "{{ UbuntuVMCPUs }}"
@@ -127,7 +127,7 @@
             device_type: vmxnet3
         cdrom:
           type: iso
-          iso_path: "[{{ DataStore }}] {{ DataStoreDir }}/{{ UbuntuNewISO }}"
+          iso_path: "[{{ Datastore }}] {{ DatastoreDir }}/{{ UbuntuNewISO }}"
         annotation: | 
                     *** Auto-Deployed by Ansible ***
                     Username: {{ UbuntuOSUser }}
@@ -135,9 +135,9 @@
 
     - name: Start checking if the Ubuntu VM is ready
       vmware_guest_info:
-        hostname: "{{ ESXiHost }}"
-        username: "{{ ESXiUser }}"
-        password: "{{ ESXiPassword }}"
+        hostname: "{{ vCenterServer }}"
+        username: "{{ vCenterUser }}"
+        password: "{{ vCenterPassword }}"
         datacenter: "{{ DataCenter }}"
         validate_certs: no
         name: "{{ UbuntuVMName }}"
@@ -149,9 +149,9 @@
 
     - name: Set password for the Ubuntu user
       vmware_vm_shell:
-        hostname: "{{ ESXiHost }}"
-        username: "{{ ESXiUser }}"
-        password: "{{ ESXiPassword }}"
+        hostname: "{{ vCenterServer }}"
+        username: "{{ vCenterUser }}"
+        password: "{{ vCenterPassword }}"
         validate_certs: no
         vm_id: "{{ UbuntuVMName }}"
         vm_username: "{{ UbuntuOSUser }}"
@@ -167,9 +167,9 @@
 
     - name: Copy network configuration file to Ubuntu VM
       vmware_guest_file_operation:
-        hostname: "{{ ESXiHost }}"
-        username: "{{ ESXiUser }}"
-        password: "{{ ESXiPassword }}"
+        hostname: "{{ vCenterServer }}"
+        username: "{{ vCenterUser }}"
+        password: "{{ vCenterPassword }}"
         validate_certs: no
         vm_id: "{{ UbuntuVMName }}"
         vm_username: "{{ UbuntuOSUser }}"
@@ -180,9 +180,9 @@
 
     - name: Move network configuration file to right location on Ubuntu VM
       vmware_vm_shell:
-        hostname: "{{ ESXiHost }}"
-        username: "{{ ESXiUser }}"
-        password: "{{ ESXiPassword }}"
+        hostname: "{{ vCenterServer }}"
+        username: "{{ vCenterUser }}"
+        password: "{{ vCenterPassword }}"
         validate_certs: no
         vm_id: "{{ UbuntuVMName }}"
         vm_username: "{{ UbuntuOSUser }}"
@@ -192,9 +192,9 @@
 
     - name: Appply the network configuration on Ubuntu VM
       vmware_vm_shell:
-        hostname: "{{ ESXiHost }}"
-        username: "{{ ESXiUser }}"
-        password: "{{ ESXiPassword }}"
+        hostname: "{{ vCenterServer }}"
+        username: "{{ vCenterUser }}"
+        password: "{{ vCenterPassword }}"
         validate_certs: no
         vm_id: "{{ UbuntuVMName }}"
         vm_username: "{{ UbuntuOSUser }}"
