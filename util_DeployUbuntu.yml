@@ -53,12 +53,6 @@
     - name: Mount Ubuntu ISO
       action: mount name="{{ WorkingDir }}/iso" src="{{ TempDir }}/{{ UbuntuISO }}" opts=loop fstype=iso9660 state=mounted
 
-    - name: Copy Ubuntu ISO contents to working directory
-      copy: 
-        src: "{{ WorkingDir }}/iso/"
-        dest: "{{ WorkingDir }}/isocopy/"
-        mode: "666"
-
     - name: Copy txt.cfg from Ubuntu ISO
       copy: 
         src: "{{ WorkingDir }}/iso/isolinux/txt.cfg"
