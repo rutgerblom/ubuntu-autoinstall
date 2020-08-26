@@ -143,7 +143,7 @@
         name: "{{ UbuntuVMName }}"
         schema: vsphere
       register: vm_facts
-      #until: vm_facts.instance.guest.hostName is search(UbuntuOSHostname)
+      until: vm_facts.instance.guest.hostName is search(UbuntuOSHostname)
       retries: 30
       delay: 60
 
