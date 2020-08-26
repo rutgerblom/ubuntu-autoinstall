@@ -15,13 +15,13 @@
     vSphereCluster: ""
     VMFolder: ha-datacenter/vm
     DataStore: VMs
-    DataStoreDir: /Lab-ISO-Folder
+    DataStoreDir: /SDDCLab-ISO-Folder
     UbuntuVMName: ubuntu-server
     UbuntuVMDiskSize: 50           # gigabytes
     UbuntuVMMemorySize: 2048       # megabytes
     UbuntuVMCPUs: 1
     UbuntuVMCPUCores: 1
-    UbuntuVMPortGroup: "Lab-Routers"
+    UbuntuVMPortGroup: Lab-Routers
     UbuntuOSLocale: en_US
     UbuntuOSKeyboardLayout: en
     UbuntuOSKeyboardVariant: us
@@ -57,35 +57,44 @@
       copy: 
         src: "{{ WorkingDir }}/iso/"
         dest: "{{ WorkingDir }}/isocopy/"
+        mode: "666"
 
-    - name: Unmount Ubuntu ISO
-      action: mount name="{{ WorkingDir }}/iso" src="{{ TempDir }}/{{ UbuntuISO }}" fstype=iso9660 state=absent
+    - name: Copy txt.cfg from Ubuntu ISO
+      copy: 
+        src: "{{ WorkingDir }}/iso/isolinux/txt.cfg"
+        dest: "{{ WorkingDir }}/isocopy/isolinux/"
+        mode: "666"
 
     - name: Edit txt.cfg to modify append line 
       replace:
         dest: "{{ WorkingDir }}/isocopy/isolinux/txt.cfg"
         regexp: 'append   initrd=/casper/initrd quiet  ---'
-        replace: 'append   initrd=/casper/initrd quiet --- autoinstall ds=nocloud;s=/cdrom/SDDC.Lab/'
+        replace: 'append   initrd=/casper/initrd quiet --- autoinstall ds=nocloud;s=/cdrom/autoinstall/'
 
     - name: Create directory to store user-data and meta-data
       file:
-        path: "{{ WorkingDir }}/isocopy/SDDC.Lab"
+        path: "{{ WorkingDir }}/isocopy/autoinstall"
         state: directory
 
     - name: Copy user-data file to directory
       template: 
-        src: "./user-data.j2"
-        dest: "{{ WorkingDir }}/isocopy/SDDC.Lab/user-data"
+        src: ./user-data.j2
+        dest: "{{ WorkingDir }}/isocopy/autoinstall/user-data"
+        mode: "666"
 
     - name: Create empty meta-data file in directory
       file:
-        path: "{{ WorkingDir }}/isocopy/SDDC.Lab/meta-data"
+        path: "{{ WorkingDir }}/isocopy/autoinstall/meta-data"
         state: touch
+        mode: "666"
 
     - name: Create custom Ubuntu ISO
-      command: "xorrisofs -relaxed-filenames -J -R -o {{ TempDir }}/{{ UbuntuNewISO }} -b isolinux/isolinux.bin -c isolinux/boot.cat -no-emul-boot -boot-load-size 4 -boot-info-table {{ WorkingDir }}/isocopy/"
+      command: "xorrisofs -relaxed-filenames -J -R -o {{ TempDir }}/{{ UbuntuNewISO }} -b isolinux/isolinux.bin -c isolinux/boot.cat -no-emul-boot -boot-load-size 4 -boot-info-table {{ WorkingDir }}/iso/ {{ WorkingDir }}/isocopy/"
       args:
         chdir: "{{ WorkingDir }}/isocopy/"
+
+    - name: Unmount Ubuntu ISO
+      action: mount name="{{ WorkingDir }}/iso" src="{{ TempDir }}/{{ UbuntuISO }}" fstype=iso9660 state=absent
 
     - name: Upload the custom Ubuntu ISO to the vSphere datastore
       vsphere_copy: 
@@ -94,9 +103,9 @@
         password: "{{ ESXiPassword }}"
         validate_certs: no
         datacenter: "{{ DataCenter }}"
-        src: "{{ TempDir }}/{{ New_UbuntuISO }}" 
+        src: "{{ TempDir }}/{{ UbuntuNewISO }}" 
         datastore: "{{ DataStore }}"
-        path: "{{ DataStoreDir }}/{{ New_UbuntuISO }}"
+        path: "{{ DataStoreDir }}/{{ UbuntuNewISO }}"
 
     - name: Deploy Ubuntu VM
       vmware_guest:
@@ -112,7 +121,7 @@
         folder: "{{ VMFolder }}"
         disk:
         - size_gb: "{{ UbuntuVMDiskSize }}"
-          type: "thin"
+          type: thin
           datastore: "{{ DataStore }}"
         hardware:
           memory_mb: "{{ UbuntuVMMemorySize }}"
@@ -123,17 +132,41 @@
           - name: "{{ UbuntuVMPortGroup }}"
             device_type: vmxnet3
         cdrom:
-          type: "iso"
-          iso_path: "[{{ DataStore }}] {{ DataStoreDir }}/{{ New_UbuntuISO }}"
-        annotation: "Username: {{ UbuntuOSUser }} Password: VMware1!"
+          type: iso
+          iso_path: "[{{ DataStore }}] {{ DataStoreDir }}/{{ UbuntuNewISO }}"
+        annotation: | 
+                    *** Auto-Deployed by Ansible ***
+                    Username: {{ UbuntuOSUser }}
+                    Password: {{ UbuntuOSPassword }}
 
-    - name: Wait 10 minutes for the Ubuntu installation to complete
-      pause:
-        seconds: 600
+    - name: Start checking if the Ubuntu VM is ready
+      vmware_guest_info:
+        hostname: "{{ ESXiHost }}"
+        username: "{{ ESXiUser }}"
+        password: "{{ ESXiPassword }}"
+        validate_certs: no
+        name: "{{ UbuntuVMName }}"
+        schema: vsphere
+      register: vm_facts
+      until: vm_facts.instance.guest.hostName is search(UbuntuOSHostname)
+      retries: 30
+      delay: 60
+
+    - name: Set password for the Ubuntu user
+      vmware_vm_shell:
+        hostname: "{{ ESXiHost }}"
+        username: "{{ ESXiUser }}"
+        password: "{{ ESXiPassword }}"
+        validate_certs: no
+        vm_id: "{{ UbuntuVMName }}"
+        vm_username: "{{ UbuntuOSUser }}"
+        vm_password: VMware1!
+        vm_shell: /usr/bin/echo
+        vm_shell_args: "'{{ UbuntuOSUser }}:{{ UbuntuOSPassword }}' | sudo chpasswd"
 
     - name: Copy network configuration file to working directory
       template: 
-        src: "./00-installer-config.j2"
+        src: ./00-installer-config.j2
         dest: "{{ WorkingDir }}/00-installer-config.yaml"
 
     - name: Copy network configuration file to Ubuntu VM
@@ -144,7 +177,7 @@
         validate_certs: no
         vm_id: "{{ UbuntuVMName }}"
         vm_username: "{{ UbuntuOSUser }}"
-        vm_password: "VMware1!"
+        vm_password: VMware1!
         copy:
             src: "{{ WorkingDir }}/00-installer-config.yaml"
             dest: "/home/{{ UbuntuOSUser }}/00-installer-config.yaml"
@@ -157,7 +190,7 @@
         validate_certs: no
         vm_id: "{{ UbuntuVMName }}"
         vm_username: "{{ UbuntuOSUser }}"
-        vm_password: "VMware1!"
+        vm_password: VMware1!
         vm_shell: /usr/bin/sudo
         vm_shell_args: "mv /home/{{ UbuntuOSUser }}/00-installer-config.yaml /etc/netplan/00-installer-config.yaml"
 
@@ -169,9 +202,9 @@
         validate_certs: no
         vm_id: "{{ UbuntuVMName }}"
         vm_username: "{{ UbuntuOSUser }}"
-        vm_password: "VMware1!"
+        vm_password: VMware1!
         vm_shell: /usr/bin/sudo
-        vm_shell_args: "netplan apply"
+        vm_shell_args: netplan apply
 
     - name: Delete working directory on Ansible controller
       file:
