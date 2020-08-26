@@ -16,7 +16,7 @@
     VMFolder: ha-datacenter/vm
     DataStore: Local_VMs
     DataStoreDir: /SDDCLab-ISO-Folder
-    UbuntuVMName: ubuntu-server
+    UbuntuVMName: my-ubuntu-server
     UbuntuVMDiskSize: 50           # gigabytes
     UbuntuVMMemorySize: 2048       # megabytes
     UbuntuVMCPUs: 1
@@ -29,7 +29,7 @@
     UbuntuOSIPv4Gateway: 10.203.0.1
     UbuntuOSIPv4DNS: 10.203.0.5
     UbuntuOSSearchDomain: sddc.lab
-    UbuntuOSHostname: my-server
+    UbuntuOSHostname: my-ubuntu-server
     UbuntuOSUser: ubuntu
     UbuntuOSPassword: VMware1!
   tasks:
