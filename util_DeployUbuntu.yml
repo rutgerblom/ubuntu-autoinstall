@@ -142,9 +142,19 @@
         name: "{{ UbuntuVMName }}"
         schema: vsphere
       register: vm_facts
-      until: vm_facts.instance.guest.hostName is search(UbuntuOSHostname)
+      #until: vm_facts.instance.guest.hostName is search(UbuntuOSHostname)
       retries: 30
       delay: 60
+
+    - name: DEBUG -- Display vm_facts variable (Pause)
+      pause:
+        seconds: "30"
+        prompt: |
+          ================================ Display vm_facts Variable ===================================
+
+              vm_facts: {{ vm_facts | to_nice_yaml(indent=2) }}
+
+          =================================================================================================
 
     - name: Set password for the Ubuntu user
       vmware_vm_shell:
