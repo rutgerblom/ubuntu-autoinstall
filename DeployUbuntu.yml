@@ -1,47 +1,50 @@
 ---
 - hosts: localhost
-  name: util_DeployUbuntu.yml
+  name:  DeployUbuntu.yml
   gather_facts: false
   vars:
-    TempDir: /tmp                                      # Temp directory on the local machine
-    WorkingDir: /tmp/ubuntu20                          # Working directory on the local machine
-    UbuntuISO: ubuntu-20.04.1-live-server-amd64.iso    # Ubuntu ISO filename
-    UbuntuISO_URL: https://releases.ubuntu.com/20.04/  # Ubuntu ISO URL
-    UbuntuNewISO: ubuntu2004.iso                       # Name of the custom ISO that will be created
-    vCenterServer: vcenter.demo.local                  # vSphere vCenter FQDN
-    vCenterUser: administrator@vsphere.local           # vSphere vCenter username
-    vCenterPassword: VMware1!                          # vSphere vCenter password
-    DataCenter: Datacenter                             # vSphere vCenter datacenter
-    vSphereCluster: Demo                               # vSphere vCenter cluster
-    VMFolder: Datacenter/vm/Demo                       # vSphere vCenter VM folder
-    Datastore: Demo                                    # vSphere datastore              
-    DatastoreDir: /Demo-ISO-Folder                     # vSphere datastore directory                            
-    UbuntuVMName: demo-server                          # Ubuntu VM name of the virtual machine          
-    UbuntuVMDiskSize: 50                               # Ubuntu VM disksize in gigabytes
-    UbuntuVMMemorySize: 2048                           # Ubuntu VM memory size in megabytes
-    UbuntuVMCPUs: 1                                    # Ubuntu VM number of CPUs 
-    UbuntuVMCPUCores: 1                                # Ubuntu VM number of cores
-    UbuntuVMPortGroup: Demo-VLAN                       # Ubuntu VM vSphere portgroup 
-    UbuntuOSLocale: en_US                              # Ubuntu OS locale
-    UbuntuOSKeyboardLayout: en                         # Ubuntu OS keyboard layout 
-    UbuntuOSKeyboardVariant: us                        # Ubuntu OS keyboard variant
-    UbuntuOSIPv4Address: 10.203.0.50/24                # Ubuntu OS IPv4 address
-    UbuntuOSIPv4Gateway: 10.203.0.1                    # Ubuntu OS IPv4 gateway
-    UbuntuOSIPv4DNS: 10.203.0.5                        # Ubuntu OS DNS server
-    UbuntuOSSearchDomain: sddc.lab                     # Ubuntu OS DNS search domain
-    UbuntuOSHostname: demo-server                      # Ubuntu OS hostname
-    UbuntuOSUser: ubuntu                               # Ubuntu OS username
-    UbuntuOSPassword: VMware1!                         # Ubuntu OS password
+    TempDir:                   /tmp                                 # Temp directory on the local machine
+    WorkingDir:                /tmp/ubuntu20                        # Working directory on the local machine
+    UbuntuISO:                 ubuntu-20.04.1-live-server-amd64.iso # Ubuntu ISO filename
+    UbuntuISO_URL:             https://releases.ubuntu.com/20.04/   # Ubuntu ISO URL
+    UbuntuNewISO:              ubuntu2004.iso                       # Ubuntu custom ISO name
+    vCenterServer:             vcenter.demo.local                   # vCenter FQDN
+    vCenterUser:               administrator@vsphere.local          # vCenter username
+    vCenterPassword:           VMware1!                             # vCenter password
+    DataCenter:                Datacenter                           # vCenter datacenter
+    vSphereCluster:            Demo                                 # vCenter cluster
+    VMFolder:                  Datacenter/vm/Demo                   # vCenter VM folder
+    Datastore:                 Demo                                 # vSphere datastore              
+    DatastoreDir:              /Demo-ISO-Folder                     # vSphere datastore ISO directory                            
+    UbuntuVMName:              demo-server                          # Ubuntu VM name of the virtual machine          
+    UbuntuVMDiskSize:          50                                   # Ubuntu VM disksize in gigabytes
+    UbuntuVMMemorySize:        2048                                 # Ubuntu VM memory size in megabytes
+    UbuntuVMCPUs:              1                                    # Ubuntu VM number of CPUs 
+    UbuntuVMCPUCores:          1                                    # Ubuntu VM number of cores
+    UbuntuVMPortGroup:         Demo-VLAN                            # Ubuntu VM vSphere portgroup 
+    UbuntuOSLocale:            en_US                                # Ubuntu OS locale
+    UbuntuOSKeyboardLayout:    en                                   # Ubuntu OS keyboard layout 
+    UbuntuOSKeyboardVariant:   us                                   # Ubuntu OS keyboard variant
+    UbuntuOSIPv4Address:       10.203.0.50/24                       # Ubuntu OS IPv4 address
+    UbuntuOSIPv4Gateway:       10.203.0.1                           # Ubuntu OS IPv4 gateway
+    UbuntuOSIPv4DNS:           10.203.0.5                           # Ubuntu OS DNS server
+    UbuntuOSSearchDomain:      sddc.lab                             # Ubuntu OS DNS search domain
+    UbuntuOSHostname:          demo-server                          # Ubuntu OS hostname
+    UbuntuOSUser:              ubuntu                               # Ubuntu OS username
+    UbuntuOSPassword:          VMware1!                             # Ubuntu OS password
+
   tasks:
     - name: Create working directory on Ansible Controller
       file:
         path: "{{ WorkingDir }}"
         state: directory
 
+
     - name: Check if Ubuntu ISO exists locally on Ansible Controller
       stat:
         path: "{{ TempDir }}/{{ UbuntuISO }}"
       register: InstallerFileCheck
+
 
     - name: Download Ubuntu ISO (if ISO file doesn't exist locally)
       get_url:
@@ -50,8 +53,10 @@
       when:
         - InstallerFileCheck.stat.exists != true
         
+
     - name: Mount Ubuntu ISO
       action: mount name="{{ WorkingDir }}/iso" src="{{ TempDir }}/{{ UbuntuISO }}" opts=loop fstype=iso9660 state=mounted
+
 
     - name: Copy txt.cfg from Ubuntu ISO
       copy: 
@@ -59,22 +64,26 @@
         dest: "{{ WorkingDir }}/isocopy/isolinux/"
         mode: "666"
 
+
     - name: Edit txt.cfg to modify append line 
       replace:
         dest: "{{ WorkingDir }}/isocopy/isolinux/txt.cfg"
         regexp: 'append   initrd=/casper/initrd quiet  ---'
         replace: 'append   initrd=/casper/initrd quiet --- autoinstall ds=nocloud;s=/cdrom/autoinstall/'
 
+
     - name: Create directory to store user-data and meta-data
       file:
         path: "{{ WorkingDir }}/isocopy/autoinstall"
         state: directory
 
+
     - name: Copy user-data file to directory
       template: 
-        src: ./user-data.j2
+        src: ./Ubuntu_user-data.j2
         dest: "{{ WorkingDir }}/isocopy/autoinstall/user-data"
         mode: "666"
+
 
     - name: Create empty meta-data file in directory
       file:
@@ -82,13 +91,16 @@
         state: touch
         mode: "666"
 
+
     - name: Create custom Ubuntu ISO
       command: "xorrisofs -relaxed-filenames -J -R -o {{ TempDir }}/{{ UbuntuNewISO }} -b isolinux/isolinux.bin -c isolinux/boot.cat -no-emul-boot -boot-load-size 4 -boot-info-table {{ WorkingDir }}/iso/ {{ WorkingDir }}/isocopy/"
       args:
         chdir: "{{ WorkingDir }}/isocopy/"
 
+
     - name: Unmount Ubuntu ISO
       action: mount name="{{ WorkingDir }}/iso" src="{{ TempDir }}/{{ UbuntuISO }}" fstype=iso9660 state=absent
+
 
     - name: Upload the custom Ubuntu ISO to the vSphere datastore
       vsphere_copy: 
@@ -100,6 +112,7 @@
         src: "{{ TempDir }}/{{ UbuntuNewISO }}" 
         datastore: "{{ Datastore }}"
         path: "{{ DatastoreDir }}/{{ UbuntuNewISO }}"
+
 
     - name: Deploy Ubuntu VM
       vmware_guest:
@@ -133,6 +146,7 @@
                     Username: {{ UbuntuOSUser }}
                     Password: {{ UbuntuOSPassword }}
 
+
     - name: Start checking if the Ubuntu VM is ready
       vmware_guest_info:
         hostname: "{{ vCenterServer }}"
@@ -147,6 +161,7 @@
       retries: 30
       delay: 60
 
+
     - name: Set password for the Ubuntu user
       vmware_vm_shell:
         hostname: "{{ vCenterServer }}"
@@ -159,11 +174,13 @@
         vm_shell: /usr/bin/echo
         vm_shell_args: "'{{ UbuntuOSUser }}:{{ UbuntuOSPassword }}' | sudo chpasswd"
 
+
     - name: Copy network configuration file to working directory
       template: 
-        src: ./00-installer-config.j2
+        src: ./Ubuntu_Netplan.j2
         dest: "{{ WorkingDir }}/00-installer-config.yaml"
         mode: "666"
+
 
     - name: Copy network configuration file to Ubuntu VM
       vmware_guest_file_operation:
@@ -178,6 +195,7 @@
             src: "{{ WorkingDir }}/00-installer-config.yaml"
             dest: "/home/{{ UbuntuOSUser }}/00-installer-config.yaml"
 
+
     - name: Move network configuration file to right location on Ubuntu VM
       vmware_vm_shell:
         hostname: "{{ vCenterServer }}"
@@ -190,6 +208,7 @@
         vm_shell: /usr/bin/sudo
         vm_shell_args: "mv /home/{{ UbuntuOSUser }}/00-installer-config.yaml /etc/netplan/00-installer-config.yaml"
 
+
     - name: Appply the network configuration on Ubuntu VM
       vmware_vm_shell:
         hostname: "{{ vCenterServer }}"
@@ -201,6 +220,7 @@
         vm_password: VMware1!
         vm_shell: /usr/bin/sudo
         vm_shell_args: netplan apply
+
 
     - name: Delete working directory on Ansible controller
       file:
