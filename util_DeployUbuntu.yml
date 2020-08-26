@@ -163,6 +163,7 @@
       template: 
         src: ./00-installer-config.j2
         dest: "{{ WorkingDir }}/00-installer-config.yaml"
+        mode: "666"
 
     - name: Copy network configuration file to Ubuntu VM
       vmware_guest_file_operation:
