@@ -138,6 +138,7 @@
         hostname: "{{ ESXiHost }}"
         username: "{{ ESXiUser }}"
         password: "{{ ESXiPassword }}"
+        datacenter: "{{ DataCenter }}"
         validate_certs: no
         name: "{{ UbuntuVMName }}"
         schema: vsphere
