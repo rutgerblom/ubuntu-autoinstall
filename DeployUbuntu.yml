@@ -5,7 +5,7 @@
   vars:
     TempDir:                   /tmp                                 # Temp directory on the local machine
     WorkingDir:                /tmp/ubuntu20                        # Working directory on the local machine
-    UbuntuISO:                 ubuntu-20.04.1-live-server-amd64.iso # Ubuntu ISO filename
+    UbuntuISO:                 ubuntu-20.04.2-live-server-amd64     # Ubuntu ISO filename
     UbuntuISO_URL:             https://releases.ubuntu.com/20.04/   # Ubuntu ISO URL
     UbuntuNewISO:              ubuntu2004.iso                       # Ubuntu custom ISO name
     vCenterServer:             vcenter.demo.local                   # vCenter FQDN
@@ -35,19 +35,19 @@
 
   tasks:
     - name: Create working directory on Ansible Controller
-      file:
+      ansible.builtin.file:
         path: "{{ WorkingDir }}"
         state: directory
 
 
     - name: Check if Ubuntu ISO exists locally on Ansible Controller
-      stat:
+      ansible.builtin.stat:
         path: "{{ TempDir }}/{{ UbuntuISO }}"
       register: InstallerFileCheck
 
 
     - name: Download Ubuntu ISO (if ISO file doesn't exist locally)
-      get_url:
+      ansible.builtin.get_url:
         url:  "{{ UbuntuISO_URL }}{{ UbuntuISO }}"
         dest: "{{ TempDir }}/{{ UbuntuISO }}"
       when:
@@ -59,41 +59,41 @@
 
 
     - name: Copy txt.cfg from Ubuntu ISO
-      copy: 
+      ansible.builtin.replace: 
         src: "{{ WorkingDir }}/iso/isolinux/txt.cfg"
         dest: "{{ WorkingDir }}/isocopy/isolinux/"
         mode: "666"
 
 
     - name: Edit txt.cfg to modify append line 
-      replace:
+      ansible.builtin.replace:
         dest: "{{ WorkingDir }}/isocopy/isolinux/txt.cfg"
         regexp: 'append   initrd=/casper/initrd quiet  ---'
         replace: 'append   initrd=/casper/initrd quiet --- autoinstall ds=nocloud;s=/cdrom/autoinstall/'
 
 
     - name: Create directory to store user-data and meta-data
-      file:
+      ansible.builtin.file:
         path: "{{ WorkingDir }}/isocopy/autoinstall"
         state: directory
 
 
     - name: Copy user-data file to directory
-      template: 
+      ansible.builtin.template: 
         src: ./Ubuntu_user-data.j2
         dest: "{{ WorkingDir }}/isocopy/autoinstall/user-data"
         mode: "666"
 
 
     - name: Create empty meta-data file in directory
-      file:
+      ansible.builtin.file:
         path: "{{ WorkingDir }}/isocopy/autoinstall/meta-data"
         state: touch
         mode: "666"
 
 
     - name: Create custom Ubuntu ISO
-      command: "xorrisofs -relaxed-filenames -J -R -o {{ TempDir }}/{{ UbuntuNewISO }} -b isolinux/isolinux.bin -c isolinux/boot.cat -no-emul-boot -boot-load-size 4 -boot-info-table {{ WorkingDir }}/iso/ {{ WorkingDir }}/isocopy/"
+      ansible.builtin.command: "xorrisofs -relaxed-filenames -J -R -o {{ TempDir }}/{{ UbuntuNewISO }} -b isolinux/isolinux.bin -c isolinux/boot.cat -no-emul-boot -boot-load-size 4 -boot-info-table {{ WorkingDir }}/iso/ {{ WorkingDir }}/isocopy/"
       args:
         chdir: "{{ WorkingDir }}/isocopy/"
 
@@ -103,7 +103,7 @@
 
 
     - name: Upload the custom Ubuntu ISO to the vSphere datastore
-      vsphere_copy: 
+      community.vmware.vsphere_copy: 
         hostname: "{{ vCenterServer }}"
         username: "{{ vCenterUser }}"
         password: "{{ vCenterPassword }}"
@@ -115,7 +115,7 @@
 
 
     - name: Deploy Ubuntu VM
-      vmware_guest:
+      community.vmware.vmware_guest:
         hostname: "{{ vCenterServer }}"
         username: "{{ vCenterUser }}"
         password: "{{ vCenterPassword }}"
@@ -148,7 +148,7 @@
 
 
     - name: Start checking if the Ubuntu VM is ready
-      vmware_guest_info:
+      community.vmware.vmware_guest_info:
         hostname: "{{ vCenterServer }}"
         username: "{{ vCenterUser }}"
         password: "{{ vCenterPassword }}"
@@ -163,7 +163,7 @@
 
 
     - name: Set password for the Ubuntu user
-      vmware_vm_shell:
+      community.vmware.vmware_vm_shell:
         hostname: "{{ vCenterServer }}"
         username: "{{ vCenterUser }}"
         password: "{{ vCenterPassword }}"
@@ -176,14 +176,14 @@
 
 
     - name: Copy network configuration file to working directory
-      template: 
+      nsible.builtin.template: 
         src: ./Ubuntu_Netplan.j2
         dest: "{{ WorkingDir }}/00-installer-config.yaml"
         mode: "666"
 
 
     - name: Copy network configuration file to Ubuntu VM
-      vmware_guest_file_operation:
+      community.vmware.vmware_guest_file_operation:
         hostname: "{{ vCenterServer }}"
         username: "{{ vCenterUser }}"
         password: "{{ vCenterPassword }}"
@@ -197,7 +197,7 @@
 
 
     - name: Move network configuration file to right location on Ubuntu VM
-      vmware_vm_shell:
+      community.vmware.vmware_vm_shell:
         hostname: "{{ vCenterServer }}"
         username: "{{ vCenterUser }}"
         password: "{{ vCenterPassword }}"
@@ -210,7 +210,7 @@
 
 
     - name: Appply the network configuration on Ubuntu VM
-      vmware_vm_shell:
+      community.vmware.vmware_vm_shell:
         hostname: "{{ vCenterServer }}"
         username: "{{ vCenterUser }}"
         password: "{{ vCenterPassword }}"
@@ -223,6 +223,6 @@
 
 
     - name: Delete working directory on Ansible controller
-      file:
+      ansible.builtin.file:
         path: "{{ WorkingDir }}"
         state: absent
