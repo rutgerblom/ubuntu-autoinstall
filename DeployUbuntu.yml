@@ -11,17 +11,17 @@
     vCenterServer:             vcenter.demo.local                   # vCenter FQDN
     vCenterUser:               administrator@vsphere.local          # vCenter username
     vCenterPassword:           VMware1!                             # vCenter password
-    DataCenter:                Datacenter                           # vCenter datacenter
-    vSphereCluster:            Demo                                 # vCenter cluster
-    VMFolder:                  Datacenter/vm/Demo                   # vCenter VM folder
-    Datastore:                 Demo                                 # vSphere datastore              
-    DatastoreDir:              /Demo-ISO-Folder                     # vSphere datastore ISO directory                            
+    DataCenter:                SDDC                                 # vCenter datacenter
+    vSphereCluster:            Lab-Cluster                          # vCenter cluster
+    VMFolder:                  Datacenter/vm/Management             # vCenter VM folder
+    Datastore:                 Shared_VMs                           # vSphere datastore              
+    DatastoreDir:              /SDDCLab-ISO-Folder                  # vSphere datastore ISO directory                            
     UbuntuVMName:              demo-server                          # Ubuntu VM name of the virtual machine          
     UbuntuVMDiskSize:          50                                   # Ubuntu VM disksize in gigabytes
     UbuntuVMMemorySize:        2048                                 # Ubuntu VM memory size in megabytes
     UbuntuVMCPUs:              1                                    # Ubuntu VM number of CPUs 
     UbuntuVMCPUCores:          1                                    # Ubuntu VM number of cores
-    UbuntuVMPortGroup:         Demo-VLAN                            # Ubuntu VM vSphere portgroup 
+    UbuntuVMPortGroup:         VLAN-301                             # Ubuntu VM vSphere portgroup 
     UbuntuOSLocale:            en_US                                # Ubuntu OS locale
     UbuntuOSKeyboardLayout:    en                                   # Ubuntu OS keyboard layout 
     UbuntuOSKeyboardVariant:   us                                   # Ubuntu OS keyboard variant

@@ -10,7 +10,6 @@ Prepare an Ubuntu machine by running the following commands:
 * sudo pip3 install ansible pyvim pyvmomi
 * ansible-galaxy collection install community.general community.vmware ansible.posix
 * git clone https://github.com/rutgerblom/ubuntu-autoinstall.git
-* cd ubuntu-autoinstall
 
 ## Usage
 
