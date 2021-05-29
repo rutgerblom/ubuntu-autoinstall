@@ -55,8 +55,12 @@
         
 
     - name: Mount Ubuntu ISO
-      action: mount name="{{ WorkingDir }}/iso" src="{{ TempDir }}/{{ UbuntuISO }}" opts=loop fstype=iso9660 state=mounted
-
+      ansible.posix.mount:
+        path:   "{{ WorkingDir }}/iso"
+        src:    "{{ TempDir }}/{{ UbuntuISO }}"
+        fstype: iso9660
+        opts:   ro,noauto
+        state:  mounted
 
     - name: Copy txt.cfg from Ubuntu ISO
       ansible.builtin.replace: 
@@ -99,7 +103,12 @@
 
 
     - name: Unmount Ubuntu ISO
-      action: mount name="{{ WorkingDir }}/iso" src="{{ TempDir }}/{{ UbuntuISO }}" fstype=iso9660 state=absent
+      ansible.posix.mount:
+        path:   "{{ WorkingDir }}/iso"
+        src:    "{{ TempDir }}/{{ UbuntuISO }}"
+        fstype: iso9660
+        opts:   ro,noauto
+        state:  absent
 
 
     - name: Upload the custom Ubuntu ISO to the vSphere datastore
