@@ -3,8 +3,8 @@
   name:  DeployUbuntu.yml
   gather_facts: false
   vars:
-    TempDir:                   /tmp                                 # Temp directory on the local machine
-    WorkingDir:                /tmp/ubuntu20                        # Working directory on the local machine
+    TempDir:                   /tmp                                 # Temp directory on the Ansible Controller
+    WorkingDir:                /tmp/ubuntu20                        # Working directory on the Ansible Controller
     UbuntuISO:                 ubuntu-20.04.2-live-server-amd64.iso # Ubuntu ISO filename
     UbuntuISO_URL:             https://releases.ubuntu.com/20.04/   # Ubuntu ISO URL
     UbuntuNewISO:              ubuntu2004.iso                       # Ubuntu custom ISO name
@@ -234,7 +234,7 @@
         vm_shell_args: netplan apply
 
 
-    - name: Delete working directory on Ansible controller
+    - name: Delete working directory on Ansible Controller
       ansible.builtin.file:
         path: "{{ WorkingDir }}"
         state: absent
