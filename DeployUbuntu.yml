@@ -148,8 +148,11 @@
           - name: "{{ UbuntuVMPortGroup }}"
             device_type: vmxnet3
         cdrom:
-          type: iso
-          iso_path: "[{{ Datastore }}] {{ DatastoreDir }}/{{ UbuntuNewISO }}"
+          - controller_number: 0
+            unit_number: 0
+            type: iso
+            iso_path: "[{{ Datastore }}] {{ DatastoreDir }}/{{ UbuntuNewISO }}"
+            state: present
         annotation: | 
                     *** Auto-Deployed by Ansible ***
                     Username: {{ UbuntuOSUser }}
