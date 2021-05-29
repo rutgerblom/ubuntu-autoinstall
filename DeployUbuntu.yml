@@ -13,7 +13,7 @@
     vCenterPassword:           VMware1!                             # vCenter password
     DataCenter:                SDDC                                 # vCenter datacenter
     vSphereCluster:            Lab-Cluster                          # vCenter cluster
-    VMFolder:                  Datacenter/vm/Management             # vCenter VM folder
+    VMFolder:                  Management                           # vCenter VM folder
     Datastore:                 Shared_VMs                           # vSphere datastore              
     DatastoreDir:              /SDDCLab-ISO-Folder                  # vSphere datastore ISO directory                            
     UbuntuVMName:              demo-server                          # Ubuntu VM name of the virtual machine          
