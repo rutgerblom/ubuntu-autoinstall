@@ -185,7 +185,7 @@
 
 
     - name: Copy network configuration file to working directory
-      nsible.builtin.template: 
+      ansible.builtin.template: 
         src: ./Ubuntu_Netplan.j2
         dest: "{{ WorkingDir }}/00-installer-config.yaml"
         mode: "666"
