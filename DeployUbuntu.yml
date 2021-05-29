@@ -63,7 +63,7 @@
         state:  mounted
 
     - name: Copy txt.cfg from Ubuntu ISO
-      ansible.builtin.replace: 
+      ansible.builtin.copy: 
         src: "{{ WorkingDir }}/iso/isolinux/txt.cfg"
         dest: "{{ WorkingDir }}/isocopy/isolinux/"
         mode: "666"
