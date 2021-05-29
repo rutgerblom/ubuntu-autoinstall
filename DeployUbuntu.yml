@@ -5,7 +5,7 @@
   vars:
     TempDir:                   /tmp                                 # Temp directory on the local machine
     WorkingDir:                /tmp/ubuntu20                        # Working directory on the local machine
-    UbuntuISO:                 ubuntu-20.04.2-live-server-amd64     # Ubuntu ISO filename
+    UbuntuISO:                 ubuntu-20.04.2-live-server-amd64.iso # Ubuntu ISO filename
     UbuntuISO_URL:             https://releases.ubuntu.com/20.04/   # Ubuntu ISO URL
     UbuntuNewISO:              ubuntu2004.iso                       # Ubuntu custom ISO name
     vCenterServer:             vcenter.demo.local                   # vCenter FQDN
