@@ -3,35 +3,35 @@
   name: DeployUbuntu.yml
   gather_facts: false
   vars:
-    tempdir: /tmp                                       # Temp directory on the Ansible Controller
-    workingdir: /tmp/ubuntu-autoinstall                 # Working directory on the Ansible Controller
-    ubuntuiso: ubuntu-20.04.2-live-server-amd64.iso     # Ubuntu ISO filename
-    ubuntuiso_url: https://releases.ubuntu.com/20.04/   # Ubuntu ISO URL
-    ubuntunewiso: ubuntu.iso                            # Ubuntu custom ISO name
-    vcenterserver: vcenter.demo.local                   # vCenter FQDN
-    vcenteruser: administrator@vsphere.local            # vCenter username
-    vcenterpassword: VMware1!                           # vCenter password
-    datacenter: SDDC                                    # vCenter datacenter
-    vspherecluster: Lab-Cluster                         # vCenter cluster
-    vmfolder: /ha-datacenter/vm                         # vCenter VM folder
-    datastore: Shared_VMs                               # vSphere datastore
-    datastoredir: /ISO                                  # vSphere datastore ISO directory
-    ubuntuvmname: ubuntu-server                         # Ubuntu VM name of the virtual machine
-    ubuntuvmdisksize: 50                                # Ubuntu VM disksize in gigabytes
-    ubuntuvmmemorysize: 2048                            # Ubuntu VM memory size in megabytes
-    ubuntuvvmcpus: 1                                    # Ubuntu VM number of CPUs
-    ubuntuvmcpucores: 1                                 # Ubuntu VM number of cores
-    ubuntuvmportgroup: VLAN-301                         # Ubuntu VM vSphere portgroup
-    ubuntuoslocale: en_US                               # Ubuntu OS locale
-    ubuntuoskeyboardlayout: en                          # Ubuntu OS keyboard layout
-    ubuntuoskeyboardvariant: us                         # Ubuntu OS keyboard variant
-    ubuntuosipv4address: 10.203.0.50/24                 # Ubuntu OS IPv4 address
-    ubuntuosipv4gateway: 10.203.0.1                     # Ubuntu OS IPv4 gateway
-    ubuntuosipv4dns: 10.203.0.5                         # Ubuntu OS DNS server
-    ubuntuossearchdomain: sddc.lab                      # Ubuntu OS DNS search domain
-    ubuntuoshostname: ubbuntu-server                    # Ubuntu OS hostname
-    ubuntuosuser: ubuntu                                # Ubuntu OS username
-    ubuntuospassword: VMware1!                          # Ubuntu OS password
+    tempdir: /tmp                                            # Temp directory on the Ansible Controller
+    workingdir: /tmp/ubuntu-autoinstall                      # Working directory on the Ansible Controller
+    ubuntuiso: ubuntu-20.04.2-live-server-amd64.iso          # Ubuntu ISO filename
+    ubuntuiso_url: http://old-releases.ubuntu.com/20.04.2/   # Ubuntu ISO URL
+    ubuntunewiso: ubuntu.iso                                 # Ubuntu custom ISO name
+    vcenterserver: vcenter.demo.local                        # vCenter FQDN
+    vcenteruser: administrator@vsphere.local                 # vCenter username
+    vcenterpassword: VMware1!                                # vCenter password
+    datacenter: SDDC                                         # vCenter datacenter
+    vspherecluster: Lab-Cluster                              # vCenter cluster
+    vmfolder: /ha-datacenter/vm                              # vCenter VM folder
+    datastore: Shared_VMs                                    # vSphere datastore
+    datastoredir: /ISO                                       # vSphere datastore ISO directory
+    ubuntuvmname: ubuntu-server                              # Ubuntu VM name of the virtual machine
+    ubuntuvmdisksize: 50                                     # Ubuntu VM disksize in gigabytes
+    ubuntuvmmemorysize: 2048                                 # Ubuntu VM memory size in megabytes
+    ubuntuvvmcpus: 1                                         # Ubuntu VM number of CPUs
+    ubuntuvmcpucores: 1                                      # Ubuntu VM number of cores
+    ubuntuvmportgroup: VLAN-301                              # Ubuntu VM vSphere portgroup
+    ubuntuoslocale: en_US                                    # Ubuntu OS locale
+    ubuntuoskeyboardlayout: en                               # Ubuntu OS keyboard layout
+    ubuntuoskeyboardvariant: us                              # Ubuntu OS keyboard variant
+    ubuntuosipv4address: 10.203.0.50/24                      # Ubuntu OS IPv4 address
+    ubuntuosipv4gateway: 10.203.0.1                          # Ubuntu OS IPv4 gateway
+    ubuntuosipv4dns: 10.203.0.5                              # Ubuntu OS DNS server
+    ubuntuossearchdomain: sddc.lab                           # Ubuntu OS DNS search domain
+    ubuntuoshostname: ubbuntu-server                         # Ubuntu OS hostname
+    ubuntuosuser: ubuntu                                     # Ubuntu OS username
+    ubuntuospassword: VMware1!                               # Ubuntu OS password
 
   tasks:
     - name: Create working directory on Ansible Controller
