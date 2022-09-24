@@ -120,15 +120,6 @@
       changed_when: false
 
 
-    - name: Unmount ubuntu ISO
-      ansible.posix.mount:
-        path: "{{ workingdir }}/iso"
-        src: "{{ workingdir }}/{{ ubuntuiso }}"
-        fstype: iso9660
-        opts: ro,noauto
-        state: absent
-
-
     - name: Upload the custom ubuntu ISO to the vSphere datastore
       community.vmware.vsphere_copy:
         hostname: "{{ vcenterserver }}"
