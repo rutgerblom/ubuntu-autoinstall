@@ -50,7 +50,7 @@
       ansible.builtin.get_url:
         url: "{{ ubuntuiso_url }}{{ ubuntuiso }}"
         dest: "{{ workingdir }}/{{ ubuntuiso }}"
-        mode: "666"
+        mode: "755"
       when:
         - not installerfilecheck.stat.exists
 
@@ -70,7 +70,7 @@
 ## Details of the issue and the workaround: https://askubuntu.com/questions/1394441/ubuntu-20-04-3-autoinstall-with-embedded-user-data-crashing-i-got-workaround
 
     - name: Extract the Packages.gz file on Ubuntu ISO
-      ansible.builtin.command: "gunzip {{ workingdir }}/iso/dists/focal/main/binary-amd64/Packages.gz --keep"
+      ansible.builtin.command: "gunzip -f {{ workingdir }}/iso/dists/focal/main/binary-amd64/Packages.gz --keep"
       changed_when: false
 
 ## End workaround issue with Ubuntu autoinstall
@@ -80,7 +80,7 @@
       ansible.builtin.copy:
         src: "{{ workingdir }}/iso/isolinux/txt.cfg"
         dest: "{{ workingdir }}/isocopy/isolinux/"
-        mode: "666"
+        mode: "775"
 
 
     - name: Edit txt.cfg to modify append line
@@ -94,21 +94,21 @@
       ansible.builtin.file:
         path: "{{ workingdir }}/isocopy/autoinstall"
         state: directory
-        mode: "666"
+        mode: "755"
 
 
     - name: Copy user-data file to directory
       ansible.builtin.template:
         src: ./ubuntu_user-data.j2
         dest: "{{ workingdir }}/isocopy/autoinstall/user-data"
-        mode: "666"
+        mode: "755"
 
 
     - name: Create empty meta-data file in directory
       ansible.builtin.file:
         path: "{{ workingdir }}/isocopy/autoinstall/meta-data"
         state: touch
-        mode: "666"
+        mode: "755"
 
 
     - name: Create custom ubuntu ISO
@@ -200,7 +200,7 @@
       ansible.builtin.template:
         src: ./ubuntu_Netplan.j2
         dest: "{{ workingdir }}/00-installer-config.yaml"
-        mode: "666"
+        mode: "755"
 
 
     - name: Copy network configuration file to ubuntu VM
