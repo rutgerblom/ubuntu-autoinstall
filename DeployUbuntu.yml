@@ -37,7 +37,7 @@
       ansible.builtin.file:
         path: "{{ workingdir }}"
         state: directory
-        mode: "666"
+        mode: "755"
 
 
     - name: Check if ubuntu ISO exists locally on Ansible Controller
@@ -56,7 +56,7 @@
 
 
     - name: Extract Ubuntu ISO
-      ansible.builtin.command: "xorriso -osirrox on -indev {{ workingdir }}/{{ ubuntuiso }}\
+      ansible.builtin.command: "xorriso -osirrox on -indev {{ workingdir }}/{{ ubuntuiso }} \
                                -extract / {{ workingdir }}/iso"
       changed_when: false
 
@@ -112,7 +112,7 @@
 
 
     - name: Create custom ubuntu ISO
-      ansible.builtin.command: "xorrisofs -relaxed-filenames -J -R -o {{ workingdir }}/{{ ubuntunewiso }}\
+      ansible.builtin.command: "xorrisofs -relaxed-filenames -J -R -o {{ workingdir }}/{{ ubuntunewiso }} \
                                -b isolinux/isolinux.bin -c isolinux/boot.cat -no-emul-boot -boot-load-size 4 -boot-info-table\
                                {{ workingdir }}/iso/{{ workingdir }}/isocopy/"
       args:
