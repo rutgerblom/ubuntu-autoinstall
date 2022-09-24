@@ -1,0 +1,3 @@
+ansible
+pyvim
+pyvmomi 
