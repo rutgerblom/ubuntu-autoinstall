@@ -3,8 +3,7 @@
   name: DeployUbuntu.yml
   gather_facts: false
   vars:
-    tempdir: /tmp                                                 # Temp directory on the Ansible Controller
-    workingdir: /tmp/ubuntu-autoinstall                           # Working directory on the Ansible Controller
+    workingdir: "{{ lookup('env','HOME') }}/ubuntu-autoinstall"   # Temp directory on the Ansible Controller
     ubuntuiso: ubuntu-20.04.2-live-server-amd64.iso               # Ubuntu ISO filename
     ubuntuiso_url: http://old-releases.ubuntu.com/releases/20.04/ # Ubuntu ISO URL
     ubuntunewiso: ubuntu.iso                                      # Ubuntu custom ISO name
@@ -43,26 +42,39 @@
 
     - name: Check if ubuntu ISO exists locally on Ansible Controller
       ansible.builtin.stat:
-        path: "{{ tempdir }}/{{ ubuntuiso }}"
+        path: "{{ workingdir }}/{{ ubuntuiso }}"
       register: installerfilecheck
 
 
     - name: Download ubuntu ISO (if ISO file doesn't exist locally)
       ansible.builtin.get_url:
         url: "{{ ubuntuiso_url }}{{ ubuntuiso }}"
-        dest: "{{ tempdir }}/{{ ubuntuiso }}"
+        dest: "{{ workingdir }}/{{ ubuntuiso }}"
         mode: "666"
       when:
         - not installerfilecheck.stat.exists
 
 
-    - name: Mount ubuntu ISO
-      ansible.posix.mount:
-        path: "{{ workingdir }}/iso"
-        src: "{{ tempdir }}/{{ ubuntuiso }}"
-        fstype: iso9660
-        opts: ro,noauto
-        state: mounted
+    - name: Extract Ubuntu ISO
+      ansible.builtin.command: "xorriso -osirrox on -indev {{ workingdir }}/{{ ubuntuiso }}\
+                               -extract / {{ workingdir }}/iso"
+      changed_when: false
+
+
+    - name: Add write permission to extracted files
+      ansible.builtin.command: "chmod -R +w {{ workingdir }}/iso"    # Using chmod as Ansible (Python) can't handle the recursion depth on the Ubuntu ISO
+      changed_when: false
+
+
+## Start workaround issue with Ubuntu autoinstall
+## Details of the issue and the workaround: https://askubuntu.com/questions/1394441/ubuntu-20-04-3-autoinstall-with-embedded-user-data-crashing-i-got-workaround
+
+    - name: Extract the Packages.gz file on Ubuntu ISO
+      ansible.builtin.command: "gunzip {{ workingdir }}/iso/dists/focal/main/binary-amd64/Packages.gz --keep"
+      changed_when: false
+
+## End workaround issue with Ubuntu autoinstall
+
 
     - name: Copy txt.cfg from ubuntu ISO
       ansible.builtin.copy:
@@ -100,7 +112,7 @@
 
 
     - name: Create custom ubuntu ISO
-      ansible.builtin.command: "xorrisofs -relaxed-filenames -J -R -o {{ tempdir }}/{{ ubuntunewiso }}\
+      ansible.builtin.command: "xorrisofs -relaxed-filenames -J -R -o {{ workingdir }}/{{ ubuntunewiso }}\
                                -b isolinux/isolinux.bin -c isolinux/boot.cat -no-emul-boot -boot-load-size 4 -boot-info-table\
                                {{ workingdir }}/iso/{{ workingdir }}/isocopy/"
       args:
@@ -111,7 +123,7 @@
     - name: Unmount ubuntu ISO
       ansible.posix.mount:
         path: "{{ workingdir }}/iso"
-        src: "{{ tempdir }}/{{ ubuntuiso }}"
+        src: "{{ workingdir }}/{{ ubuntuiso }}"
         fstype: iso9660
         opts: ro,noauto
         state: absent
@@ -124,7 +136,7 @@
         password: "{{ vcenterpassword }}"
         validate_certs: false
         datacenter: "{{ datacenter }}"
-        src: "{{ tempdir }}/{{ ubuntunewiso }}"
+        src: "{{ workingdir }}/{{ ubuntunewiso }}"
         datastore: "{{ datastore }}"
         path: "{{ datastoredir }}/{{ ubuntunewiso }}"
 
