@@ -113,8 +113,8 @@
 
     - name: Create custom ubuntu ISO
       ansible.builtin.command: "xorrisofs -relaxed-filenames -J -R -o {{ workingdir }}/{{ ubuntunewiso }} \
-                               -b isolinux/isolinux.bin -c isolinux/boot.cat -no-emul-boot -boot-load-size 4 -boot-info-table\
-                               {{ workingdir }}/iso/{{ workingdir }}/isocopy/"
+                               -b isolinux/isolinux.bin -c isolinux/boot.cat -no-emul-boot -boot-load-size 4 -boot-info-table \
+                               {{ workingdir }}/iso/ {{ workingdir }}/isocopy/"
       args:
         chdir: "{{ workingdir }}/isocopy/"
       changed_when: false
