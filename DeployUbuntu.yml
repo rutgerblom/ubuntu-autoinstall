@@ -99,7 +99,7 @@
 
     - name: Copy user-data file to directory
       ansible.builtin.template:
-        src: ./ubuntu_user-data.j2
+        src: ./Ubuntu_user-data.j2
         dest: "{{ workingdir }}/isocopy/autoinstall/user-data"
         mode: "755"
 
