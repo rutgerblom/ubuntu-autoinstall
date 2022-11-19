@@ -1,6 +1,6 @@
 # ubuntu-autoinstall
 
-An Ansible Playbook that performs an unattended Ubuntu Server 20.04 VM installation on VMware vSphere.
+An Ansible Playbook that performs unattended Ubuntu Server 20.04 VM installations on VMware vSphere.
 
 ## Prerequisites
 
@@ -13,6 +13,6 @@ Prepare an Ubuntu machine by running the following commands:
 
 ## Usage
 
-Modify the variables in **DeployUbuntu.yml** so that they match your environment. Start the Ubuntu Server deployment by running:
+Modify the variables in **Variables.yml** so that they match your environment and your requirements. Start the Ubuntu Server deployment by running:
 <br>
 **ansible-playbook DeployUbuntu.yml**

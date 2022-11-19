@@ -1,6 +1,8 @@
 ---
 - hosts: localhost
   name: DeployUbuntu.yml
+  vars_files:
+    - Variables.yml
   gather_facts: false
   tasks:
     - name: Create working directory on Ansible Controller
@@ -108,23 +110,23 @@
         password: "{{ vCenter.Password }}"
         validate_certs: false
         name: "{{ item.Name }}"
-        state: "{{ item.PowerState }}"
-        guest_id: "{{ item.GuestID }}"
-        datacenter: "{{ item.Datacenter }}"
-        cluster: "{{ item.Cluster }}"
-        folder: "{{ item.Folder }}"
+        state: "{{ item.Configuration.VM.PowerState }}"
+        guest_id: "{{ item.Configuration.VM.GuestID }}"
+        datacenter: "{{ item.Placement.Datacenter }}"
+        cluster: "{{ item.Placement.Cluster }}"
+        folder: "{{ item.Placement.Folder }}"
         disk:
-          - size_gb: "{{ iten.DiskSize }}"
-            type: "{{ item.DiskType }}"
-            datastore: "{{ item.Datastore }}"
+          - size_gb: "{{ item.Configuration.Storage.DiskSize }}"
+            type: "{{ item.Configuration.Storage.DiskType }}"
+            datastore: "{{ item.Placement.Datastore }}"
         hardware:
-          memory_mb: "{{ item.MemorySize }}"
-          num_cpus: "{{ item.CPUs }}"
-          num_cpu_cores_per_socket: "{{ item.Cores }}"
-          scsi: "{{ item.SCSIController }}"
+          memory_mb: "{{ item.Configuration.Compute.MemorySize }}"
+          num_cpus: "{{ item.Configuration.Compute.CPUs }}"
+          num_cpu_cores_per_socket: "{{ item.Configuration.Compute.Cores }}"
+          scsi: "{{ item.Configuration.Storage.SCSIController }}"
         networks:
-          - name: "{{ item.Portgroup }}"
-            device_type: "{{ item.NetworkAdapter }}"
+          - name: "{{ item.Configuration.Network.Portgroup }}"
+            device_type: "{{ item.Configuration.Network.NetworkAdapter }}"
         cdrom:
           - controller_number: 0
             unit_number: 0
@@ -133,8 +135,8 @@
             state: present
         annotation: |
                     *** Auto-Deployed by Ansible ***
-                    Username: {{ item.OSuser }}
-                    Password: {{ item.OSpassword }}
+                    Username: {{ item.Configuration.OS.User }}
+                    Password: {{ item.Configuration.OS.Password }}
       loop: "{{ VMs }}"
 
 
@@ -143,7 +145,7 @@
         hostname: "{{ vCenter.FQDN }}"
         username: "{{ vCenter.User }}"
         password: "{{ vCenter.Password }}"
-        datacenter: "{{ item.Datacenter }}"
+        datacenter: "{{ item.Placement.Datacenter }}"
         validate_certs: false
         name: "{{ item.Name }}"
         schema: vsphere
@@ -161,10 +163,10 @@
         password: "{{ vCenter.Password }}"
         validate_certs: false
         vm_id: "{{ item.Name }}"
-        vm_username: "{{ item.OSuser }}"
+        vm_username: "{{ item.Configuration.OS.User }}"
         vm_password: VMware1!
         vm_shell: /usr/bin/echo
-        vm_shell_args: "'{{ item.OSuser }}:{{ item.OSpassword }}' | sudo chpasswd"
+        vm_shell_args: "'{{ item.Configuration.OS.User }}:{{ item.Configuration.OS.Password }}' | sudo chpasswd"
       loop: "{{ VMs }}"
 
 
@@ -182,11 +184,11 @@
         password: "{{ vCenter.Password }}"
         validate_certs: false
         vm_id: "{{ item.Name }}"
-        vm_username: "{{ item.OSuser }}"
+        vm_username: "{{ item.Configuration.OS.User }}"
         vm_password: VMware1!
         copy:
           src: "{{ Global.Workingdir }}/00-installer-config.yaml"
-          dest: "/home/{{ item.OSuser }}/00-installer-config.yaml"
+          dest: "/home/{{ item.Configuration.OS.User }}/00-installer-config.yaml"
       loop: "{{ VMs }}"
 
 
@@ -197,10 +199,10 @@
         password: "{{ vCenter.Password }}"
         validate_certs: false
         vm_id: "{{ item.Name }}"
-        vm_username: "{{ item.OSuser }}"
+        vm_username: "{{ item.Configuration.OS.User }}"
         vm_password: VMware1!
         vm_shell: /usr/bin/sudo
-        vm_shell_args: "mv /home/{{ item.OSuser }}/00-installer-config.yaml /etc/netplan/00-installer-config.yaml"
+        vm_shell_args: "mv /home/{{ item.Configuration.OS.User }}/00-installer-config.yaml /etc/netplan/00-installer-config.yaml"
       loop: "{{ VMs }}"
 
 
@@ -211,7 +213,7 @@
         password: "{{ vCenter.Password }}"
         validate_certs: false
         vm_id: "{{ item.Name }}"
-        vm_username: "{{ item.OSuser }}"
+        vm_username: "{{ item.Configuration.OS.User }}"
         vm_password: VMware1!
         vm_shell: /usr/bin/sudo
         vm_shell_args: netplan apply
