@@ -2,11 +2,11 @@ network:
   ethernets:
     ens192:
       addresses:
-      - {{ UbuntuOSIPv4Address }} 
-      gateway4: {{ UbuntuOSIPv4Gateway }}
+      - {{ item.Configuration.OS.IPv4Address }} 
+      gateway4: {{ item.Configuration.OS.IPv4Gateway }}
       nameservers:
         addresses:
-        - {{ UbuntuOSIPv4DNS }}
+        - {{ item.Configuration.OS.IPv4DNS }}
         search:
-        - {{ UbuntuOSSearchDomain }}
+        - {{ item.Configuration.OS.SearchDomain }}
   version: 2

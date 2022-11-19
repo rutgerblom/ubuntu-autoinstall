@@ -28,7 +28,7 @@
 
 
     - name: Extract Ubuntu ISO
-      ansible.builtin.command: "xorrISO -osirrox on -indev {{ Global.Workingdir }}/{{ Global.UbuntuISO }} \
+      ansible.builtin.command: "xorriso -osirrox on -indev {{ Global.Workingdir }}/{{ Global.UbuntuISO }} \
                                -extract / {{ Global.Workingdir }}/ISO"
       changed_when: false
 
@@ -84,7 +84,7 @@
 
 
     - name: Create custom Ubuntu ISO
-      ansible.builtin.command: "xorrISOfs -relaxed-filenames -J -R -o {{ Global.Workingdir }}/ubuntu.iso \
+      ansible.builtin.command: "xorrisofs -relaxed-filenames -J -R -o {{ Global.Workingdir }}/ubuntu.iso \
                                -b ISOlinux/ISOlinux.bin -c ISOlinux/boot.cat -no-emul-boot -boot-load-size 4 -boot-info-table \
                                {{ Global.Workingdir }}/ISO/ {{ Global.Workingdir }}/ISOcopy/"
       args:

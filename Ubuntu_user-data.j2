@@ -1,25 +1,25 @@
 #cloud-config
 autoinstall:
   version: 1
-  locale: {{ ubuntuoslocale }}
+  locale: {{ item.Configuration.OS.Locale }}
   keyboard:
-    layout: {{ ubuntuoskeyboardlayout }}
-    variant: {{ ubuntuoskeyboardvariant }}
+    layout: {{ item.Configuration.OS.Keyboardlayout }}
+    variant: {{ item.Configuration.OS.Keyboardvariant }}
   network:
     network:
       version: 2
       ethernets:
         ens192:
-          addresses: [{{ ubuntuosipv4address }}]
-          gateway4: {{ ubuntuosipv4gateway }}
+          addresses: [{{ item.Configuration.OS.IPv4Address }}]
+          gateway4: {{ item.Configuration.OS.IPv4Gateway }}
           nameservers:
-            addresses: [{{ ubuntuosipv4dns }}]
-            search: [{{ ubuntuossearchdomain }}]
+            addresses: [{{ item.Configuration.OS.IPv4DNS }}]
+            search: [{{ item.Configuration.OS.SearchDomain }}]
   identity:
-    hostname: {{ ubuntuoshostname }}
-    username: {{ ubuntuosuser }}
+    hostname: {{ item.Configuration.OS.Hostname }}
+    username: {{ item.Configuration.OS.User }}
     password: "$6$ryx4qBcSL3V1qKaU$UVKN5KO0gwjUqha0OQkGX8CL/Dbp3NCPo52vEvXO1/2s3NkFcvw540HPWc1g6/7UFEmYEbeRXFdttuguFsvj00" # VMware1!
   ssh:
     install-server: yes
   late-commands:
-    - echo '{{ ubuntuosuser }} ALL=(ALL) NOPASSWD:ALL' > /target/etc/sudoers.d/ubuntu # Allow user to run sudo without password
+    - echo '{{ item.Configuration.OS.User }} ALL=(ALL) NOPASSWD:ALL' > /target/etc/sudoers.d/ubuntu # Allow user to run sudo without password
