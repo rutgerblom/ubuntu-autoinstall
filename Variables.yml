@@ -3,8 +3,9 @@ Global:
   Workingdir: "{{ lookup('env','HOME') }}/ubuntu-autoinstall"     # Temp directory on the Ansible Controller
   UbuntuISO: ubuntu-20.04.2-live-server-amd64.iso                 # Ubuntu ISO filename
   UbuntuISO_URL: http://old-releases.ubuntu.com/releases/20.04/   # Ubuntu ISO URL
+  Datacenter: SDDC                                                # The vCenter Datacenter
   Datastore: Shared_VMs                                           # The vSphere Datastore where the ISO will be stored
-  Datastoredir: /ISO                                              # The vSphere Datastore directory where the ISO will be stored. This directory must exist.
+  DatastoreDir: /ISO                                              # The vSphere Datastore directory where the ISO will be stored. This directory must exist.
 
 vCenter:
   FQDN: vcenter.demo.local                       # vCenter FQDN

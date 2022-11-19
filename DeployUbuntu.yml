@@ -51,45 +51,51 @@
     - name: Copy txt.cfg from Ubuntu ISO
       ansible.builtin.copy:
         src: "{{ Global.Workingdir }}/ISO/isolinux/txt.cfg"
-        dest: "{{ Global.Workingdir }}/ISOcopy/isolinux/"
+        dest: "{{ Global.Workingdir }}/ISOcopy/{{ item.Name }}/isolinux/"
         mode: "775"
+      loop: "{{ VMs }}"
 
 
     - name: Edit txt.cfg to modify append line
       ansible.builtin.replace:
-        dest: "{{ Global.Workingdir }}/ISOcopy/isolinux/txt.cfg"
+        dest: "{{ Global.Workingdir }}/ISOcopy/{{ item.Name }}/isolinux/txt.cfg"
         regexp: 'append   initrd=/casper/initrd quiet  ---'
         replace: 'append   initrd=/casper/initrd quiet --- autoinstall ds=nocloud;s=/cdrom/autoinstall/'
+      loop: "{{ VMs }}"
 
 
     - name: Create directory to store user-data and meta-data
       ansible.builtin.file:
-        path: "{{ Global.Workingdir }}/ISOcopy/autoinstall"
+        path: "{{ Global.Workingdir }}/ISOcopy/{{ item.Name }}/autoinstall"
         state: directory
         mode: "755"
+      loop: "{{ VMs }}"
 
 
-    - name: Copy user-data file to directory
+    - name: Copy user-data file(s) to directory
       ansible.builtin.template:
         src: ./Ubuntu_user-data.j2
-        dest: "{{ Global.Workingdir }}/ISOcopy/autoinstall/user-data"
+        dest: "{{ Global.Workingdir }}/ISOcopy/{{ item.Name }}/autoinstall/user-data"
         mode: "755"
+      loop: "{{ VMs }}"
 
 
     - name: Create empty meta-data file in directory
       ansible.builtin.file:
-        path: "{{ Global.Workingdir }}/ISOcopy/autoinstall/meta-data"
+        path: "{{ Global.Workingdir }}/ISOcopy/{{ item.Name }}/autoinstall/meta-data"
         state: touch
         mode: "755"
+      loop: "{{ VMs }}"
 
 
     - name: Create custom Ubuntu ISO
-      ansible.builtin.command: "xorrisofs -relaxed-filenames -J -R -o {{ Global.Workingdir }}/ubuntu.iso \
+      ansible.builtin.command: "xorrisofs -relaxed-filenames -J -R -o {{ Global.Workingdir }}/{{ item.Name }}.iso \
                                -b isolinux/isolinux.bin -c isolinux/boot.cat -no-emul-boot -boot-load-size 4 -boot-info-table \
-                               {{ Global.Workingdir }}/ISO/ {{ Global.Workingdir }}/ISOcopy/"
+                               {{ Global.Workingdir }}/ISO/ {{ Global.Workingdir }}/ISOcopy/{{ item.Name }}"
       args:
-        chdir: "{{ Global.Workingdir }}/ISOcopy/"
+        chdir: "{{ Global.Workingdir }}/ISOcopy/{{ item.Name }}"
       changed_when: false
+      loop: "{{ VMs }}"
 
 
     - name: Upload the custom Ubuntu ISO to the vSphere datastore
@@ -98,9 +104,11 @@
         username: "{{ vCenter.User }}"
         password: "{{ vCenter.Password }}"
         validate_certs: false
-        src: "{{ Global.Workingdir }}/ubuntu.iso"
-        datastore: "{{ datastore }}"
-        path: "{{ Global.Datastoredir }}/ubuntu.iso"
+        datacenter: "{{ Global.Datacenter }}"
+        src: "{{ Global.Workingdir }}/{{ item.Name }}.iso"
+        datastore: "{{ Global.Datastore }}"
+        path: "{{ Global.DatastoreDir }}/{{ item.Name }}.iso"
+      loop: "{{ VMs }}"
 
 
     - name: Deploy Ubuntu VM
@@ -130,8 +138,8 @@
         cdrom:
           - controller_number: 0
             unit_number: 0
-            type: ISO
-            ISO_path: "[{{ Global.Datastore }}] {{ Global.Datastoredir }}/ubuntu.iso"
+            type: iso
+            iso_path: "[{{ Global.Datastore }}] {{ Global.DatastoreDir }}/{{ item }}.iso"
             state: present
         annotation: |
                     *** Auto-Deployed by Ansible ***
