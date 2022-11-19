@@ -50,14 +50,14 @@
 
     - name: Copy txt.cfg from Ubuntu ISO
       ansible.builtin.copy:
-        src: "{{ Global.Workingdir }}/ISO/ISOlinux/txt.cfg"
-        dest: "{{ Global.Workingdir }}/ISOcopy/ISOlinux/"
+        src: "{{ Global.Workingdir }}/ISO/isolinux/txt.cfg"
+        dest: "{{ Global.Workingdir }}/ISOcopy/isolinux/"
         mode: "775"
 
 
     - name: Edit txt.cfg to modify append line
       ansible.builtin.replace:
-        dest: "{{ Global.Workingdir }}/ISOcopy/ISOlinux/txt.cfg"
+        dest: "{{ Global.Workingdir }}/ISOcopy/isolinux/txt.cfg"
         regexp: 'append   initrd=/casper/initrd quiet  ---'
         replace: 'append   initrd=/casper/initrd quiet --- autoinstall ds=nocloud;s=/cdrom/autoinstall/'
 
@@ -85,7 +85,7 @@
 
     - name: Create custom Ubuntu ISO
       ansible.builtin.command: "xorrisofs -relaxed-filenames -J -R -o {{ Global.Workingdir }}/ubuntu.iso \
-                               -b ISOlinux/ISOlinux.bin -c ISOlinux/boot.cat -no-emul-boot -boot-load-size 4 -boot-info-table \
+                               -b isolinux/isolinux.bin -c isolinux/boot.cat -no-emul-boot -boot-load-size 4 -boot-info-table \
                                {{ Global.Workingdir }}/ISO/ {{ Global.Workingdir }}/ISOcopy/"
       args:
         chdir: "{{ Global.Workingdir }}/ISOcopy/"
