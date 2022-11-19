@@ -1,0 +1,39 @@
+---
+Global:
+  Workingdir: "{{ lookup('env','HOME') }}/ubuntu-autoinstall"     # Temp directory on the Ansible Controller
+  UbuntuISO: ubuntu-20.04.2-live-server-amd64.iso                 # Ubuntu ISO filename
+  UbuntuISO_URL: http://old-releases.ubuntu.com/releases/20.04/   # Ubuntu ISO URL
+  Datastore: Shared_VMs                                           # The vSphere Datastore where the ISO will be stored
+  Datastoredir: /ISO                                              # The vSphere Datastore directory where the ISO will be stored. This directory must exist.
+
+vCenter:
+  FQDN: vcenter.demo.local                       # vCenter FQDN
+  User: administrator@vsphere.local              # vCenter username
+  Password: VMware1!                             # vCenter password
+
+VMs:
+  - Name: ubuntu-server01                        # The name of the virtual machine
+    GuestID: ubuntu64Guest                       # The Guest OS ID
+    Datacenter: SDDC                             # The vCenter Datacenter
+    Cluster: Lab-Cluster                         # The vSphere Cluster 
+    Folder: /                                    # The vCenter VM folder
+    Datastore: Shared_VMs                        # The vSphere datastore
+    DiskSize: 50                                 # Ubuntu VM disksize in GB
+    DiskType: thin                               # Ubuntu VM Disk Type
+    SCSIController: paravirtual                  # Ubuntu VM SCSI Adapter
+    MemorySize: 2048                             # Ubuntu VM memory size in MB
+    CPUs: 1                                      # Ubuntu VM number of CPUs
+    Cores: 1                                     # Ubuntu VM number of cores
+    Portgroup: VLAN-301                          # Ubuntu VM vSphere portgroup
+    NetworkAdapter: vmxnet3                      # Ubunti VM Network Adapter
+    PowerState: poweredon                        # Ubuntu VM Power State
+    OSlocale: en_US                              # Ubuntu OS locale
+    OSkeyboardlayout: en                         # Ubuntu OS keyboard layout
+    OSkeyboardvariant: us                        # Ubuntu OS keyboard variant
+    OSipv4address: 10.203.0.50/24                # Ubuntu OS IPv4 address
+    OSipv4gateway: 10.203.0.1                    # Ubuntu OS IPv4 gateway
+    OSipv4dns: 10.203.0.5                        # Ubuntu OS DNS server
+    OSsearchdomain: sddc.lab                     # Ubuntu OS DNS search domain
+    OShostname: ubbuntu-server                   # Ubuntu OS hostname
+    OSuser: ubuntu                               # Ubuntu OS username
+    OSpassword: VMware1!                         # Ubuntu OS password
