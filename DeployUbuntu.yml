@@ -139,7 +139,7 @@
           - controller_number: 0
             unit_number: 0
             type: iso
-            iso_path: "[{{ Global.Datastore }}] {{ Global.DatastoreDir }}/{{ item }}.iso"
+            iso_path: "[{{ Global.Datastore }}] {{ Global.DatastoreDir }}/{{ item.Name }}.iso"
             state: present
         annotation: |
                     *** Auto-Deployed by Ansible ***
