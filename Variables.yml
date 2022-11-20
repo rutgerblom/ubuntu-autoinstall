@@ -37,7 +37,7 @@ VMs:
       OS:
         User: ubuntu                             # Ubuntu OS username
         Password: VMware1!                       # Ubuntu OS password
-        Hostname: ubbuntu-server01               # Ubuntu OS hostname
+        Hostname: ubuntu-server01                # Ubuntu OS hostname
         Locale: en_US                            # Ubuntu OS locale
         Keyboardlayout: en                       # Ubuntu OS keyboard layout
         Keyboardvariant: us                      # Ubuntu OS keyboard variant

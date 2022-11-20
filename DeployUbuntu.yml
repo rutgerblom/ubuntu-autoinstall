@@ -18,7 +18,7 @@
       register: installerfilecheck
 
 
-    - name: Download Ubuntu ISO (if ISO file doesn't exist locally)
+    - name: Download Ubuntu ISO if ISO file doesn't exist locally
       ansible.builtin.get_url:
         url: "{{ Global.UbuntuISO_URL }}{{ Global.UbuntuISO }}"
         dest: "{{ Global.Workingdir }}/{{ Global.UbuntuISO }}"
@@ -34,7 +34,7 @@
 
 
     - name: Add write permission to extracted files
-      ansible.builtin.command: "chmod -R +w {{ Global.Workingdir }}/ISO"    # Using chmod as Ansible (Python) can't handle the recursion depth on the Ubuntu ISO
+      ansible.builtin.command: "chmod -R +w {{ Global.Workingdir }}/ISO"    # Using chmod as Ansible (Python) can't handle the directory structure depth on the Ubuntu ISO
       changed_when: false
 
 
@@ -161,7 +161,7 @@
       until: vm_facts.instance.guest.hostName is search(ubuntuoshostname)
       retries: 30
       delay: 60
-      loop: "{{ VMs }}"
+      loop: "{{ VMs | dict2items }}"
 
 
     - name: Set password for the Ubuntu user
