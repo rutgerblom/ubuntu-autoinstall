@@ -13,27 +13,27 @@ vCenter:
   Password: VMware1!                             # vCenter password
 
 VMs:
-  - Name: ubuntu-server01                        # The name of the virtual machine
+  - Name: ubuntu-server01                        # The VM's name
     Placement:
-      Datacenter: SDDC                           # The vCenter Datacenter
-      Cluster: Lab-Cluster                       # The vSphere Cluster 
-      Datastore: Shared_VMs                      # The vSphere datastore
-      Folder: /                                  # The vCenter VM folder
+      Datacenter: SDDC                           # The VM's vCenter Datacenter
+      Cluster: Lab-Cluster                       # The VM's vSphere Cluster 
+      Datastore: Shared_VMs                      # The VM's vSphere datastore
+      Folder: /                                  # The VM's vCenter VM folder
     Configuration:
       VM:
-        GuestID: ubuntu64Guest                   # The Guest OS ID
-        PowerState: poweredon                    # Ubuntu VM Power State
+        GuestID: ubuntu64Guest                   # The VM's Guest OS ID
+        PowerState: poweredon                    # The VM's Power State
       Storage:
-        DiskSize: 50                             # Ubuntu VM disksize in GB
-        DiskType: thin                           # Ubuntu VM Disk Type
-        SCSIController: paravirtual              # Ubuntu VM SCSI Adapter
+        DiskSize: 50                             # The VM's disksize in GB
+        DiskType: thin                           # The VM's Disk Type
+        SCSIController: paravirtual              # The VM's SCSI Adapter
       Compute:
-        MemorySize: 2048                         # Ubuntu VM memory size in MB
-        CPUs: 1                                  # Ubuntu VM number of CPUs
-        Cores: 1                                 # Ubuntu VM number of cores
+        MemorySize: 2048                         # The VM's memory size in MB
+        CPUs: 1                                  # The VM's number of CPUs
+        Cores: 1                                 # The VM's number of Cores
       Network:
-        Portgroup: VLAN-301                      # Ubuntu VM vSphere portgroup
-        NetworkAdapter: vmxnet3                  # Ubunti VM Network Adapter
+        Portgroup: VLAN-301                      # The VM's vSphere Portgroup
+        NetworkAdapter: vmxnet3                  # The VM's Network Adapter
       OS:
         User: ubuntu                             # Ubuntu OS username
         Password: VMware1!                       # Ubuntu OS password
