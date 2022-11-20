@@ -181,8 +181,9 @@
     - name: Copy network configuration file to working directory
       ansible.builtin.template:
         src: ./ubuntu_Netplan.j2
-        dest: "{{ Global.Workingdir }}/00-installer-config.yaml"
+        dest: "{{ Global.Workingdir }}/{{ item.Name }}-00-installer-config.yaml"
         mode: "755"
+      loop: "{{ VMs }}"
 
 
     - name: Copy network configuration file to Ubuntu VM
@@ -195,8 +196,8 @@
         vm_username: "{{ item.Configuration.OS.User }}"
         vm_password: VMware1!
         copy:
-          src: "{{ Global.Workingdir }}/00-installer-config.yaml"
-          dest: "/home/{{ item.Configuration.OS.User }}/00-installer-config.yaml"
+          src: "{{ Global.Workingdir }}/{{ item.Name }}-00-installer-config.yaml"
+          dest: "/home/{{ item.Configuration.OS.User }}/{{ item.Name }}-00-installer-config.yaml"
       loop: "{{ VMs }}"
 
 
@@ -210,7 +211,7 @@
         vm_username: "{{ item.Configuration.OS.User }}"
         vm_password: VMware1!
         vm_shell: /usr/bin/sudo
-        vm_shell_args: "mv /home/{{ item.Configuration.OS.User }}/00-installer-config.yaml /etc/netplan/00-installer-config.yaml"
+        vm_shell_args: "mv /home/{{ item.Configuration.OS.User }}/{{ item.Name }}-00-installer-config.yaml /etc/netplan/00-installer-config.yaml"
       loop: "{{ VMs }}"
 
 
