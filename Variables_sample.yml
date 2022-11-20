@@ -3,21 +3,21 @@ Global:
   Workingdir: "{{ lookup('env','HOME') }}/ubuntu-autoinstall"     # Temp directory on the Ansible Controller
   UbuntuISO: ubuntu-20.04.2-live-server-amd64.iso                 # Ubuntu ISO filename
   UbuntuISO_URL: http://old-releases.ubuntu.com/releases/20.04/   # Ubuntu ISO URL
-  Datacenter: SDDC                                                # The vCenter Datacenter
-  Datastore: Shared_VMs                                           # The vSphere Datastore where the ISO will be stored
-  DatastoreDir: /ISO                                              # The vSphere Datastore directory where the ISO will be stored. This directory must exist.
+  Datacenter: Pod-210-DataCenter                                  # The vCenter Datacenter
+  Datastore: ComputeA_vSAN                                        # The vSphere Datastore where the Ubuntu ISO will be stored
+  DatastoreDir: /ISO                                              # The vSphere Datastore directory where the Ubuntu ISO will be stored. This directory is created if it doesn't exist.
 
 vCenter:
-  FQDN: vcenter.demo.local                       # vCenter FQDN
+  FQDN: pod-210-vcenter.sddc.lab                 # vCenter FQDN
   User: administrator@vsphere.local              # vCenter username
   Password: VMware1!                             # vCenter password
 
 VMs:
   - Name: ubuntu-server01                        # The VM's name
     Placement:
-      Datacenter: SDDC                           # The VM's vCenter Datacenter
-      Cluster: Lab-Cluster                       # The VM's vSphere Cluster 
-      Datastore: Shared_VMs                      # The VM's vSphere datastore
+      Datacenter: Pod-210-DataCenter             # The VM's vCenter Datacenter
+      Cluster: ComputeA                          # The VM's vSphere Cluster 
+      Datastore: ComputeA_vSAN                   # The VM's vSphere datastore
       Folder: /                                  # The VM's vCenter VM folder
     Configuration:
       VM:
@@ -32,7 +32,7 @@ VMs:
         CPUs: 1                                  # The VM's number of CPUs
         Cores: 1                                 # The VM's number of Cores
       Network:
-        Portgroup: VLAN-301                      # The VM's vSphere Portgroup
+        Portgroup: VMNetwork                     # The VM's vSphere Portgroup
         NetworkAdapter: vmxnet3                  # The VM's Network Adapter
       OS:
         User: ubuntu                             # Ubuntu OS username
