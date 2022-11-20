@@ -161,7 +161,7 @@
       until: vm_facts.instance.guest.hostName is search(ubuntuoshostname)
       retries: 30
       delay: 60
-      loop: "{{ VMs | dict2items }}"
+      loop: "{{ VMs }}"
 
 
     - name: Set password for the Ubuntu user
