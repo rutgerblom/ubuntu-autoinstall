@@ -242,6 +242,18 @@
       loop: "{{ VMsToDeploy }}"
       when: item.Deploy
 
+    - name: Delete custom Ubuntu ISO(s) from the datastore
+      community.vmware.vsphere_file:
+        host: "{{ vCenter.FQDN }}"
+        username: "{{ vCenter.User }}"
+        password: "{{ vCenter.Password }}"
+        validate_certs: false
+        datacenter: "{{ Global.ISODatacenter }}"
+        datastore: "{{ Global.ISODatastore }}"
+        path: "{{ Global.ISODatastoreDir }}/{{ item.Name }}.iso"
+        state: absent
+      loop: "{{ VMsToDeploy }}"
+      when: item.Deploy
 
     - name: Delete working directory on Ansible Controller
       ansible.builtin.file:
