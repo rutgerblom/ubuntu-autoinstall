@@ -4,7 +4,7 @@ An Ansible Playbook that performs unattended Ubuntu Server 20.04 VM installation
 
 ## Prerequisites
 
-Prepare an Ubuntu machine by running the following commands:
+Prepare an Ubuntu machine as Ansible Controller by running the following commands:
 
 * ```sudo apt update && sudo apt install python3 python3-pip git xorriso```
 * ```git clone https://github.com/rutgerblom/ubuntu-autoinstall.git ~/git/ubuntu-autoinstall```
