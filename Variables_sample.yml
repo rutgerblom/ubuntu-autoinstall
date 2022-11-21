@@ -5,6 +5,7 @@ Global:
   UbuntuISO_URL: http://old-releases.ubuntu.com/releases/20.04/   # Ubuntu ISO URL
   ISODatastore: ComputeA_vSAN                                     # The vSphere Datastore where the Ubuntu ISO will be stored
   ISODatastoreDir: /ISO                                           # The vSphere Datastore directory where the Ubuntu ISO will be stored. This directory is created if it doesn't exist.
+  ISODatacenter: Pod-210-DataCenter                               # The vSphere Datacenter to which the vSphere ISODatastore belongs
 
 vCenter:
   FQDN: pod-210-vcenter.sddc.lab                 # vCenter FQDN

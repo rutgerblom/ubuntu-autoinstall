@@ -104,6 +104,7 @@
         username: "{{ vCenter.User }}"
         password: "{{ vCenter.Password }}"
         validate_certs: false
+        datacenter: "{{ Global.ISODatacenter }}"
         src: "{{ Global.Workingdir }}/{{ item.Name }}.iso"
         datastore: "{{ Global.ISODatastore }}"
         path: "{{ Global.ISODatastoreDir }}/{{ item.Name }}.iso"
