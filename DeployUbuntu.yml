@@ -2,7 +2,7 @@
 - hosts: localhost
   name: DeployUbuntu.yml
   vars_files:
-    - Variables.yml
+    - variables.yml
   gather_facts: false
   tasks:
     - name: Create working directory on Ansible Controller

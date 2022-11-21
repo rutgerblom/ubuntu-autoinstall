@@ -13,4 +13,4 @@ Prepare an Ubuntu machine as Ansible Controller by running the following command
 
 ## Usage
 
-Copy the ```Variables_sample.yml``` file to ```Variables.yml``` and modify the settings so that they match your environment and your requirements. Start the Ubuntu Server deployment by running: ```ansible-playbook DeployUbuntu.yml```
+Copy the ```variables_sample.yml``` file to ```variables.yml``` and modify the settings so that they match your environment and your requirements. Start the Ubuntu Server deployment by running: ```ansible-playbook DeployUbuntu.yml```
