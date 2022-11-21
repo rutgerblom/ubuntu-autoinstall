@@ -48,12 +48,13 @@
 ## End workaround issue with Ubuntu autoinstall
 
 
-    - name: Copy txt.cfg from Ubuntu ISO
+    - name: Copy txt.cfg file(s) from Ubuntu ISO
       ansible.builtin.copy:
         src: "{{ Global.Workingdir }}/ISO/isolinux/txt.cfg"
         dest: "{{ Global.Workingdir }}/ISOcopy/{{ item.Name }}/isolinux/"
         mode: "775"
       loop: "{{ VMsToDeploy }}"
+      when: item.Deploy
 
 
     - name: Edit txt.cfg to modify append line
@@ -62,6 +63,7 @@
         regexp: 'append   initrd=/casper/initrd quiet  ---'
         replace: 'append   initrd=/casper/initrd quiet --- autoinstall ds=nocloud;s=/cdrom/autoinstall/'
       loop: "{{ VMsToDeploy }}"
+      when: item.Deploy
 
 
     - name: Create directory to store user-data and meta-data
@@ -70,6 +72,7 @@
         state: directory
         mode: "755"
       loop: "{{ VMsToDeploy }}"
+      when: item.Deploy
 
 
     - name: Copy user-data file(s) to directory
@@ -78,17 +81,19 @@
         dest: "{{ Global.Workingdir }}/ISOcopy/{{ item.Name }}/autoinstall/user-data"
         mode: "755"
       loop: "{{ VMsToDeploy }}"
+      when: item.Deploy
 
 
-    - name: Create empty meta-data file in directory
+    - name: Create empty meta-data file(s)
       ansible.builtin.file:
         path: "{{ Global.Workingdir }}/ISOcopy/{{ item.Name }}/autoinstall/meta-data"
         state: touch
         mode: "755"
       loop: "{{ VMsToDeploy }}"
+      when: item.Deploy
 
 
-    - name: Create custom Ubuntu ISO
+    - name: Create custom Ubuntu ISO(s)
       ansible.builtin.command: "xorrisofs -relaxed-filenames -J -R -o {{ Global.Workingdir }}/{{ item.Name }}.iso \
                                -b isolinux/isolinux.bin -c isolinux/boot.cat -no-emul-boot -boot-load-size 4 -boot-info-table \
                                {{ Global.Workingdir }}/ISO/ {{ Global.Workingdir }}/ISOcopy/{{ item.Name }}"
@@ -96,9 +101,10 @@
         chdir: "{{ Global.Workingdir }}/ISOcopy/{{ item.Name }}"
       changed_when: false
       loop: "{{ VMsToDeploy }}"
+      when: item.Deploy
 
 
-    - name: Upload the custom Ubuntu ISO to the vSphere datastore
+    - name: Upload the custom Ubuntu ISO(s) to the vSphere datastore
       community.vmware.vsphere_copy:
         hostname: "{{ vCenter.FQDN }}"
         username: "{{ vCenter.User }}"
@@ -109,9 +115,10 @@
         datastore: "{{ Global.ISODatastore }}"
         path: "{{ Global.ISODatastoreDir }}/{{ item.Name }}.iso"
       loop: "{{ VMsToDeploy }}"
+      when: item.Deploy
 
 
-    - name: Deploy Ubuntu VM
+    - name: Deploy Ubuntu VM(s)
       community.vmware.vmware_guest:
         hostname: "{{ vCenter.FQDN }}"
         username: "{{ vCenter.User }}"
@@ -146,9 +153,10 @@
                     Username: {{ item.Configuration.OS.User }}
                     Password: {{ item.Configuration.OS.Password }}
       loop: "{{ VMsToDeploy }}"
+      when: item.Deploy
 
 
-    - name: Start checking if the Ubuntu VM is ready
+    - name: Start checking if the Ubuntu VM(s) is/are ready
       community.vmware.vmware_guest_info:
         hostname: "{{ vCenter.FQDN }}"
         username: "{{ vCenter.User }}"
@@ -162,6 +170,7 @@
       retries: 30
       delay: 60
       loop: "{{ VMsToDeploy }}"
+      when: item.Deploy
 
 
     - name: Set password for the Ubuntu user
@@ -176,17 +185,19 @@
         vm_shell: /usr/bin/echo
         vm_shell_args: "'{{ item.Configuration.OS.User }}:{{ item.Configuration.OS.Password }}' | sudo chpasswd"
       loop: "{{ VMsToDeploy }}"
+      when: item.Deploy
 
 
-    - name: Copy network configuration file to working directory
+    - name: Copy network configuration file(s) to working directory
       ansible.builtin.template:
         src: ./Ubuntu_Netplan.j2
         dest: "{{ Global.Workingdir }}/{{ item.Name }}-00-installer-config.yaml"
         mode: "755"
       loop: "{{ VMsToDeploy }}"
+      when: item.Deploy
 
 
-    - name: Copy network configuration file to Ubuntu VM
+    - name: Copy network configuration file(s) to Ubuntu VM(s)
       community.vmware.vmware_guest_file_operation:
         hostname: "{{ vCenter.FQDN }}"
         username: "{{ vCenter.User }}"
@@ -199,9 +210,10 @@
           src: "{{ Global.Workingdir }}/{{ item.Name }}-00-installer-config.yaml"
           dest: "/home/{{ item.Configuration.OS.User }}/{{ item.Name }}-00-installer-config.yaml"
       loop: "{{ VMsToDeploy }}"
+      when: item.Deploy
 
 
-    - name: Move network configuration file to right location on Ubuntu VM
+    - name: Move network configuration file to correct location on Ubuntu VM(s)
       community.vmware.vmware_vm_shell:
         hostname: "{{ vCenter.FQDN }}"
         username: "{{ vCenter.User }}"
@@ -213,9 +225,10 @@
         vm_shell: /usr/bin/sudo
         vm_shell_args: "mv /home/{{ item.Configuration.OS.User }}/{{ item.Name }}-00-installer-config.yaml /etc/netplan/00-installer-config.yaml"
       loop: "{{ VMsToDeploy }}"
+      when: item.Deploy
 
 
-    - name: Appply the network configuration on Ubuntu VM
+    - name: Appply the network configuration on Ubuntu VM(s)
       community.vmware.vmware_vm_shell:
         hostname: "{{ vCenter.FQDN }}"
         username: "{{ vCenter.User }}"
@@ -227,6 +240,7 @@
         vm_shell: /usr/bin/sudo
         vm_shell_args: netplan apply
       loop: "{{ VMsToDeploy }}"
+      when: item.Deploy
 
 
     - name: Delete working directory on Ansible Controller
