@@ -1,2 +1,2 @@
-Variables*.yml
-!Variables_sample.yml
+variables*.yml
+!variables_sample.yml
