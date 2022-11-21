@@ -3,16 +3,15 @@ Global:
   Workingdir: "{{ lookup('env','HOME') }}/ubuntu-autoinstall"     # Temp directory on the Ansible Controller
   UbuntuISO: ubuntu-20.04.2-live-server-amd64.iso                 # Ubuntu ISO filename
   UbuntuISO_URL: http://old-releases.ubuntu.com/releases/20.04/   # Ubuntu ISO URL
-  Datacenter: Pod-210-DataCenter                                  # The vCenter Datacenter
-  Datastore: ComputeA_vSAN                                        # The vSphere Datastore where the Ubuntu ISO will be stored
-  DatastoreDir: /ISO                                              # The vSphere Datastore directory where the Ubuntu ISO will be stored. This directory is created if it doesn't exist.
+  ISODatastore: ComputeA_vSAN                                     # The vSphere Datastore where the Ubuntu ISO will be stored
+  ISODatastoreDir: /ISO                                           # The vSphere Datastore directory where the Ubuntu ISO will be stored. This directory is created if it doesn't exist.
 
 vCenter:
   FQDN: pod-210-vcenter.sddc.lab                 # vCenter FQDN
   User: administrator@vsphere.local              # vCenter username
   Password: VMware1!                             # vCenter password
 
-VMs:
+VMsToDeploy:
   - Name: ubuntu-server01                        # The VM's name
     Placement:
       Datacenter: Pod-210-DataCenter             # The VM's vCenter Datacenter
@@ -41,7 +40,7 @@ VMs:
         Locale: en_US                            # Ubuntu OS locale
         Keyboardlayout: en                       # Ubuntu OS keyboard layout
         Keyboardvariant: us                      # Ubuntu OS keyboard variant
-        IPv4Address: 10.203.0.50/24              # Ubuntu OS IPv4 address
+        IPv4Address: 10.203.219.10/24            # Ubuntu OS IPv4 address
         IPv4Gateway: 10.203.0.1                  # Ubuntu OS IPv4 gateway
         IPv4DNS: 10.203.0.5                      # Ubuntu OS DNS server
         SearchDomain: sddc.lab                   # Ubuntu OS DNS search domain

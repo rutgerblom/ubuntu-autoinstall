@@ -13,4 +13,4 @@ Prepare an Ubuntu machine by running the following commands:
 
 ## Usage
 
-Copy ```Variabbles_sample.yml``` to ```Variables.yml``` and modify the settings so that they match your environment and your requirements. Start the Ubuntu Server deployment by running: ```ansible-playbook DeployUbuntu.yml```
+Copy the ```Variables_sample.yml``` file to ```Variables.yml``` and modify the settings so that they match your environment and your requirements. Start the Ubuntu Server deployment by running: ```ansible-playbook DeployUbuntu.yml```
