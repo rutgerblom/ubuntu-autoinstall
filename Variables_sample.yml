@@ -42,7 +42,7 @@ VMsToDeploy:
         Locale: en_US                            # Ubuntu OS locale
         Keyboardlayout: en                       # Ubuntu OS keyboard layout
         Keyboardvariant: us                      # Ubuntu OS keyboard variant
-        IPv4Address: 10.203.219.11/24             # Ubuntu OS IPv4 address
+        IPv4Address: 10.203.219.11/24            # Ubuntu OS IPv4 address
         IPv4Gateway: 10.203.0.1                  # Ubuntu OS IPv4 gateway
         IPv4DNS: 10.203.0.5                      # Ubuntu OS DNS server
         SearchDomain: sddc.lab                   # Ubuntu OS DNS search domain
