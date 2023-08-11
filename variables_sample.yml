@@ -1,11 +1,11 @@
 ---
 Global:
-  Workingdir: "{{ lookup('env','HOME') }}/ubuntu-autoinstall"     # Temp directory on the Ansible Controller
-  UbuntuISO: ubuntu-20.04.2-live-server-amd64.iso                 # Ubuntu ISO filename
-  UbuntuISO_URL: http://old-releases.ubuntu.com/releases/20.04/   # Ubuntu ISO URL
-  ISODatastore: ComputeA_vSAN                                     # The vSphere Datastore where the Ubuntu ISO will be stored
-  ISODatastoreDir: /ISO                                           # The vSphere Datastore directory where the Ubuntu ISO will be stored. This directory is created if it doesn't exist.
-  ISODatacenter: Pod-210-DataCenter                               # The vSphere Datacenter to which the vSphere ISODatastore belongs
+  Workingdir: "{{ lookup('env','HOME') }}/ubuntu-autoinstall"                         # Temp directory on the Ansible Controller
+  UbuntuISO: jammy-live-server-amd64.iso                                              # Ubuntu ISO filename
+  UbuntuISO_URL: https://cdimage.ubuntu.com/ubuntu-server/jammy/daily-live/current/   # Ubuntu ISO URL
+  ISODatastore: ComputeA_vSAN                                                         # The vSphere Datastore where the Ubuntu ISO will be stored
+  ISODatastoreDir: /ISO                                                               # The vSphere Datastore directory where the Ubuntu ISO will be stored. This directory is created if it doesn't exist.
+  ISODatacenter: Pod-210-DataCenter                                                   # The vSphere Datacenter to which the vSphere ISODatastore belongs
 
 vCenter:
   FQDN: pod-210-vcenter.sddc.lab                 # vCenter FQDN
@@ -40,8 +40,8 @@ VMsToDeploy:
         Password: VMware1!                       # Ubuntu OS password
         Hostname: ubuntu-server01                # Ubuntu OS hostname
         Locale: en_US                            # Ubuntu OS locale
-        Keyboardlayout: en                       # Ubuntu OS keyboard layout
-        Keyboardvariant: us                      # Ubuntu OS keyboard variant
+        Keyboardlayout: us                       # Ubuntu OS keyboard layout
+        Keyboardvariant: intl                    # Ubuntu OS keyboard variant
         IPv4Address: 10.203.219.11/24            # Ubuntu OS IPv4 address
         IPv4Gateway: 10.203.0.1                  # Ubuntu OS IPv4 gateway
         IPv4DNS: 10.203.0.5                      # Ubuntu OS DNS server
@@ -73,8 +73,8 @@ VMsToDeploy:
         Password: VMware1!                       # Ubuntu OS password
         Hostname: ubuntu-server02                # Ubuntu OS hostname
         Locale: en_US                            # Ubuntu OS locale
-        Keyboardlayout: en                       # Ubuntu OS keyboard layout
-        Keyboardvariant: us                      # Ubuntu OS keyboard variant
+        Keyboardlayout: us                       # Ubuntu OS keyboard layout
+        Keyboardvariant: intl                    # Ubuntu OS keyboard variant
         IPv4Address: 10.203.219.12/24            # Ubuntu OS IPv4 address
         IPv4Gateway: 10.203.0.1                  # Ubuntu OS IPv4 gateway
         IPv4DNS: 10.203.0.5                      # Ubuntu OS DNS server
@@ -106,8 +106,8 @@ VMsToDeploy:
         Password: VMware1!                       # Ubuntu OS password
         Hostname: ubuntu-server03                # Ubuntu OS hostname
         Locale: en_US                            # Ubuntu OS locale
-        Keyboardlayout: en                       # Ubuntu OS keyboard layout
-        Keyboardvariant: us                      # Ubuntu OS keyboard variant
+        Keyboardlayout: us                       # Ubuntu OS keyboard layout
+        Keyboardvariant: intl                    # Ubuntu OS keyboard variant
         IPv4Address: 10.203.219.13/24            # Ubuntu OS IPv4 address
         IPv4Gateway: 10.203.0.1                  # Ubuntu OS IPv4 gateway
         IPv4DNS: 10.203.0.5                      # Ubuntu OS DNS server
@@ -139,8 +139,8 @@ VMsToDeploy:
         Password: VMware1!                       # Ubuntu OS password
         Hostname: ubuntu-server04                # Ubuntu OS hostname
         Locale: en_US                            # Ubuntu OS locale
-        Keyboardlayout: en                       # Ubuntu OS keyboard layout
-        Keyboardvariant: us                      # Ubuntu OS keyboard variant
+        Keyboardlayout: us                       # Ubuntu OS keyboard layout
+        Keyboardvariant: intl                    # Ubuntu OS keyboard variant
         IPv4Address: 10.203.219.14/24            # Ubuntu OS IPv4 address
         IPv4Gateway: 10.203.0.1                  # Ubuntu OS IPv4 gateway
         IPv4DNS: 10.203.0.5                      # Ubuntu OS DNS server
@@ -172,8 +172,8 @@ VMsToDeploy:
         Password: VMware1!                       # Ubuntu OS password
         Hostname: ubuntu-server05                # Ubuntu OS hostname
         Locale: en_US                            # Ubuntu OS locale
-        Keyboardlayout: en                       # Ubuntu OS keyboard layout
-        Keyboardvariant: us                      # Ubuntu OS keyboard variant
+        Keyboardlayout: us                       # Ubuntu OS keyboard layout
+        Keyboardvariant: intl                    # Ubuntu OS keyboard variant
         IPv4Address: 10.203.219.15/24            # Ubuntu OS IPv4 address
         IPv4Gateway: 10.203.0.1                  # Ubuntu OS IPv4 gateway
         IPv4DNS: 10.203.0.5                      # Ubuntu OS DNS server

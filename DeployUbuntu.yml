@@ -28,49 +28,20 @@
 
 
     - name: Extract Ubuntu ISO
-      ansible.builtin.command: "xorriso -osirrox on -indev {{ Global.Workingdir }}/{{ Global.UbuntuISO }} \
-                               -extract / {{ Global.Workingdir }}/ISO"
+      ansible.builtin.command: "7z -y x {{ Global.Workingdir }}/{{ Global.UbuntuISO }} \
+                               -o{{ Global.Workingdir }}/ISO"
       changed_when: false
 
 
-    - name: Add write permission to extracted files
-      ansible.builtin.command: "chmod -R +w {{ Global.Workingdir }}/ISO"    # Using chmod as Ansible (Python) can't handle the directory structure depth on the Ubuntu ISO
+    - name: Move [BOOT] out of ISO extraction directory
+      ansible.builtin.command: "mv {{ Global.Workingdir }}/ISO/'[BOOT]' {{ Global.Workingdir }}/BOOT"
       changed_when: false
-
-
-## Start workaround issue with Ubuntu autoinstall
-## Details of the issue and the workaround: https://askubuntu.com/questions/1394441/ubuntu-20-04-3-autoinstall-with-embedded-user-data-crashing-i-got-workaround
-
-    - name: Extract the Packages.gz file on Ubuntu ISO
-      ansible.builtin.command: "gunzip -f {{ Global.Workingdir }}/ISO/dists/focal/main/binary-amd64/Packages.gz --keep"
-      changed_when: false
-
-## End workaround issue with Ubuntu autoinstall
-
-
-    - name: Copy txt.cfg file(s) from Ubuntu ISO
-      ansible.builtin.copy:
-        src: "{{ Global.Workingdir }}/ISO/isolinux/txt.cfg"
-        dest: "{{ Global.Workingdir }}/ISOcopy/{{ item.Name }}/isolinux/"
-        mode: "775"
-      loop: "{{ VMsToDeploy }}"
-      when: item.Deploy
-
-
-    - name: Edit txt.cfg to modify append line
-      ansible.builtin.replace:
-        dest: "{{ Global.Workingdir }}/ISOcopy/{{ item.Name }}/isolinux/txt.cfg"
-        regexp: 'append   initrd=/casper/initrd quiet  ---'
-        replace: 'append   initrd=/casper/initrd quiet --- autoinstall ds=nocloud;s=/cdrom/autoinstall/'
-      loop: "{{ VMsToDeploy }}"
-      when: item.Deploy
 
 
     - name: Create directory to store user-data and meta-data
       ansible.builtin.file:
         path: "{{ Global.Workingdir }}/ISOcopy/{{ item.Name }}/autoinstall"
         state: directory
-        mode: "755"
       loop: "{{ VMsToDeploy }}"
       when: item.Deploy
 
@@ -79,7 +50,15 @@
       ansible.builtin.template:
         src: ./Ubuntu_user-data.j2
         dest: "{{ Global.Workingdir }}/ISOcopy/{{ item.Name }}/autoinstall/user-data"
-        mode: "755"
+        mode: "666"
+      loop: "{{ VMsToDeploy }}"
+      when: item.Deploy
+
+    - name: Copy grub file(s) to directory
+      ansible.builtin.template:
+        src: ./Ubuntu_grub.j2
+        dest: "{{ Global.Workingdir }}/ISOcopy/{{ item.Name }}/boot/grub/grub.cfg"
+        mode: "666"
       loop: "{{ VMsToDeploy }}"
       when: item.Deploy
 
@@ -88,20 +67,29 @@
       ansible.builtin.file:
         path: "{{ Global.Workingdir }}/ISOcopy/{{ item.Name }}/autoinstall/meta-data"
         state: touch
-        mode: "755"
+        mode: "666"
       loop: "{{ VMsToDeploy }}"
       when: item.Deploy
 
 
     - name: Create custom Ubuntu ISO(s)
-      ansible.builtin.command: "xorrisofs -relaxed-filenames -J -R -o {{ Global.Workingdir }}/{{ item.Name }}.iso \
-                               -b isolinux/isolinux.bin -c isolinux/boot.cat -no-emul-boot -boot-load-size 4 -boot-info-table \
-                               {{ Global.Workingdir }}/ISO/ {{ Global.Workingdir }}/ISOcopy/{{ item.Name }}"
-      args:
-        chdir: "{{ Global.Workingdir }}/ISOcopy/{{ item.Name }}"
-      changed_when: false
-      loop: "{{ VMsToDeploy }}"
-      when: item.Deploy
+      ansible.builtin.command: "xorriso -as mkisofs -r \
+                                -V 'Ubuntu 22.04 LTS AUTO (EFIBIOS)' \
+                                -o {{ Global.Workingdir }}/{{ item.Name }}.iso \
+                                --grub2-mbr {{ Global.Workingdir }}/BOOT/1-Boot-NoEmul.img  \
+                                -partition_offset 16 \
+                                --mbr-force-bootable \
+                                -append_partition 2 28732ac11ff8d211ba4b00a0c93ec93b {{ Global.Workingdir }}/BOOT/2-Boot-NoEmul.img \
+                                -appended_part_as_gpt \
+                                -iso_mbr_part_type a2a0d0ebe5b9334487c068b6b72699c7 \
+                                -c '/boot.catalog' \
+                                -b '/boot/grub/i386-pc/eltorito.img' \
+                                  -no-emul-boot -boot-load-size 4 -boot-info-table --grub2-boot-info \
+                                -eltorito-alt-boot \
+                                -e '--interval:appended_partition_2:::' \
+                                -no-emul-boot \
+                                {{ Global.Workingdir }}/ISO/ {{ Global.Workingdir }}/ISOcopy/{{ item.Name }}"
+
 
 
     - name: Upload the custom Ubuntu ISO(s) to the vSphere datastore
