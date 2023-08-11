@@ -55,7 +55,6 @@
       when: item.Deploy
 
     - name: Copy grub.cfg file into ISO extraction directory
-     to directory
       ansible.builtin.copy:
         src: ./Ubuntu_grub.cfg
         dest: "{{ Global.Workingdir }}/ISO/boot/grub/grub.cfg"
