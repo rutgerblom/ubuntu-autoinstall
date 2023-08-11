@@ -87,7 +87,8 @@
                                 -e '--interval:appended_partition_2:::' \
                                 -no-emul-boot \
                                 {{ Global.Workingdir }}/ISO/ {{ Global.Workingdir }}/ISOcopy/{{ item.Name }}"
-
+      loop: "{{ VMsToDeploy }}"
+      when: item.Deploy
 
 
     - name: Upload the custom Ubuntu ISO(s) to the vSphere datastore
